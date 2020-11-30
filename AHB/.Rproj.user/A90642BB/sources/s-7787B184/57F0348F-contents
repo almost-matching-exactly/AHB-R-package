@@ -1,0 +1,50 @@
+list_mip = c()
+list_fast1 = c()
+list_fast0 = c()
+list_ATT_mip = c()
+list_ATT_fast1 = c()
+list_ATT_fast0 = c()
+test_data = NULL
+test_holdout = NULL
+times = 10
+for( i in 1:times){
+  data <- gen_data(n_units = 100)
+  holdout <- gen_data(n_units = 100)
+  treated_column_name = 'treated'
+  outcome_column_name = 'outcome'
+
+  # treated_column_name = 'V1'
+  # outcome_column_name = 'V2'
+  
+  mip_out <- AHB_MIP_match(data = data, holdout = holdout,
+                           treated_column_name = treated_column_name, outcome_column_name = outcome_column_name)
+  fast_out_0 <- AHB_fast_match(data = data, holdout = holdout,
+                                 treated_column_name = treated_column_name, outcome_column_name = outcome_column_name) # have error as boundary
+  # fast_out_1 <- AHB_fast_match_1(data = data, holdout = holdout,
+                                 # treated_column_name = treated_column_name, outcome_column_name = outcome_column_name)
+  test_data  = data
+  test_holdout = holdout
+  list_mip[i] = AHB::ATE(mip_out)
+  list_fast0[i] = AHB::ATE(fast_out_0)
+  # list_fast1[i] = AHB::ATE(fast_out_1)
+  list_ATT_mip[i] = abs(AHB::ATT(mip_out))
+  list_ATT_fast0[i] = abs(AHB::ATT(fast_out_0))
+
+}
+
+
+iterations <- 1:times
+
+plot(iterations, list_ATT_mip,
+     main="Comparison ATT between fast and mip on continous dataset",
+     ylab="Estimated ATT",
+     type="l",
+     ,ylim = c(0,6),
+     col="black")
+lines(iterations,list_ATT_fast0, type = 'l',col = 'blue',lwd = 2)
+lines(iterations,list_ATT_fast0, type = 'l',col = 'red', lwd = 2)
+legend("bottomleft",
+       c("mip","fast_new","fast_old"),
+       fill=c("black","blue","red"),
+       cex = 0.75
+)
