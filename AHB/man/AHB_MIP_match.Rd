@@ -9,7 +9,7 @@ AHB_MIP_match(
   holdout = 0.1,
   treated_column_name = "treated",
   outcome_column_name = "outcome",
-  black_box = "BART",
+  black_box = "xgb",
   cv = F,
   gamma0 = 3,
   gamma1 = 3,
@@ -18,7 +18,7 @@ AHB_MIP_match(
   M = 1e+05,
   n_prune = ifelse(is.numeric(holdout), round(0.1 * (1 - holdout) * nrow(data)),
     round(0.1 * nrow(data))),
-  MIP_solver = "Rcplex"
+  MIP_solver = "Rglpk"
 )
 }
 \arguments{
@@ -48,12 +48,10 @@ in data and holdout. Defaults to 'treated'.}
 \item{outcome_column_name}{A character with the name of the outcome column in
 holdout and also in data, if supplied in the latter. Defaults to 'outcome'.}
 
-\item{black_box}{Denotes the method to be used to generate outcome model Y. If
-"BART" and cv = F, uses \code{dbarts::bart} with keeptrees = TRUE, keepevery
-= 10, verbose = FALSE, k = 2 and ntree =200 and then the default predict
-method to estimate the outcome. If "BART" and cv = T, k and ntree will be
-best values from cross validation. Defaults to 'BART'. There will be
-multiple choices about black_box in the future.}
+\item{black_box}{Denotes the method to be used to generate outcome model Y.
+If "BART", use bartMachine as ML model to do prediction.
+If "xgb, use xgboost as ML model to do prediction.
+ Defaults to '"xgb"'.}
 
 \item{cv}{A logical scalar. If \code{TURE}, do cross-validation on the train
 set to generate outcome model Y . Defaults to \code{TRUE}.}

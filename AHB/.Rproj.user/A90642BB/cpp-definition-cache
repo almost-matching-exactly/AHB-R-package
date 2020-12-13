@@ -75,12 +75,12 @@
                 "file" : "/Users/alex/Desktop/github/AHB-R-package/AHB/src/fast_solver.cpp",
                 "kind" : 6,
                 "line" : 53,
-                "name" : "greedy_cpp(Rcpp::StringVector, Rcpp::NumericMatrix, Rcpp::IntegerVector, Rcpp::IntegerVector, Rcpp::NumericMatrix, Rcpp::LogicalVector, Rcpp::NumericVector, int, int, double, SEXP, SEXP, Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::Function, Rcpp::Function, Rcpp::Function, int)",
+                "name" : "greedy_cpp(Rcpp::StringVector, Rcpp::StringVector, Rcpp::NumericMatrix, Rcpp::IntegerVector, Rcpp::IntegerVector, Rcpp::NumericMatrix, Rcpp::LogicalVector, Rcpp::NumericVector, int, int, double, SEXP, SEXP, Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::Function, Rcpp::Function, Rcpp::Function, int)",
                 "parent_name" : "",
-                "usr" : "c:@F@greedy_cpp#$@N@Rcpp@S@Vector>#VI16#@N@Rcpp@ST>1#T@PreserveStorage#$@N@Rcpp@S@Matrix>#VI14#@N@Rcpp@ST>1#T@PreserveStorage#$@N@Rcpp@S@Vector>#VI13#@N@Rcpp@ST>1#T@PreserveStorage#S2_#S1_#$@N@Rcpp@S@Vector>#VI10#@N@Rcpp@ST>1#T@PreserveStorage#$@N@Rcpp@S@Vector>#VI14#@N@Rcpp@ST>1#T@PreserveStorage#I#I#d#*$@S@SEXPREC#S5_#S4_#S4_#$@N@Rcpp@S@Function_Impl>#@N@Rcpp@ST>1#T@PreserveStorage#S7_#S7_#I#"
+                "usr" : "c:@F@greedy_cpp#$@N@Rcpp@S@Vector>#VI16#@N@Rcpp@ST>1#T@PreserveStorage#S0_#$@N@Rcpp@S@Matrix>#VI14#@N@Rcpp@ST>1#T@PreserveStorage#$@N@Rcpp@S@Vector>#VI13#@N@Rcpp@ST>1#T@PreserveStorage#S2_#S1_#$@N@Rcpp@S@Vector>#VI10#@N@Rcpp@ST>1#T@PreserveStorage#$@N@Rcpp@S@Vector>#VI14#@N@Rcpp@ST>1#T@PreserveStorage#I#I#d#*$@S@SEXPREC#S5_#S4_#S4_#$@N@Rcpp@S@Function_Impl>#@N@Rcpp@ST>1#T@PreserveStorage#S7_#S7_#I#"
             }
         ],
         "file" : "/Users/alex/Desktop/github/AHB-R-package/AHB/src/fast_solver.cpp",
-        "file_last_write" : 1606708342.000000
+        "file_last_write" : 1607021470.000000
     }
 ]

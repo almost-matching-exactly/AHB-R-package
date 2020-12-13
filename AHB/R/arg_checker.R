@@ -29,10 +29,9 @@ check_args_fast <-function(data, holdout,
     }
   }
 
-  if(black_box != 'BART'){
-    stop(paste('black_box must be BART now.'))
+  if(black_box != 'BART' & black_box != 'xgb'){
+    stop(paste('black_box must be BART or xgb now.'))
   }
-
   data_cols <- colnames(data)
   holdout_cols <- colnames(holdout)
 
@@ -105,8 +104,8 @@ check_args_MIP <-function(data, holdout,
                'data to use as a holdout set.'))
   }
 
-  if(black_box != 'BART'){
-    stop(paste('black_box must be BART now.'))
+  if(black_box != 'BART' & black_box != 'xgb'){
+    stop(paste('black_box must be BART or xgb now.'))
   }
   data_cols <- colnames(data)
   holdout_cols <- colnames(holdout)

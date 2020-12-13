@@ -35,16 +35,19 @@ License: BSD
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    dbarts,
-    Rcplex,
+    stats,
     Rcpp,
-    utils,
-    Rglpk
+    utils
 RoxygenNote: 7.1.0
 LinkingTo: 
     Rcpp
 Suggests: 
     knitr,
+    Rcplex,
+    Rglpk,
     rmarkdown,
-    testthat
+    testthat,
+    glmnet,
+    bartMachine,
+    xgboost
 VignetteBuilder: knitr

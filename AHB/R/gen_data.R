@@ -25,7 +25,7 @@
 #' @export
 
 
-gen_data <- function(n_units=100, p=5){
+gen_data <- function(n_units=100, p=4){
 
 
   beta0 <- 2 # Baseline response
@@ -38,7 +38,7 @@ gen_data <- function(n_units=100, p=5){
   ## Generate outcome
   eps <- rnorm(n_units, 0, 1)
   Y1 <- beta0 + (X[, 1] > 1.5) * beta_tilde + eps
-  Y0 <- beta0 + eps
+  Y0 <- beta0  + eps
 
   Y = Y1 * Z + Y0 * (1-Z)
 

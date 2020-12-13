@@ -19,7 +19,7 @@
 test_that("Try small dataset on MIP ", {
   p <- 5
   df <- gen_data(n_units = 100, p = p)
-  MIP_out <- AHB_MIP_match(data = df, holdout = 0.5)
+  MIP_out <- AHB_MIP_match(data = df, holdout = 0.5,black_box='BART')
   print(AHB::ATE(MIP_out))
   print(AHB::ATT(MIP_out))
 })

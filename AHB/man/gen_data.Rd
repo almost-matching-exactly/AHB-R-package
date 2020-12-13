@@ -4,7 +4,7 @@
 \alias{gen_data}
 \title{Generate Toy Data for AHB Matching}
 \usage{
-gen_data(n_units = 100, p = 5)
+gen_data(n_units = 100, p = 4)
 }
 \arguments{
 \item{n_units}{Number of units desired in the data set. Defaults to 100.}

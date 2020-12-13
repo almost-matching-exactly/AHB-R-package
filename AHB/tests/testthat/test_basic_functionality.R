@@ -1,4 +1,6 @@
 # author: Xian Sun, Duke University, 2020
+
+
 test_that("column order doesn't matter", {
   p <- 4
   data <- gen_data(n_units = 50, p = p)
@@ -13,7 +15,6 @@ test_that("column order doesn't matter", {
   scrambled_MIP_out <- AHB_MIP_match(data = scrambled_data, holdout = scrambled_holdout)
 
 })
-
 
 test_that("outcome/treatment name doesn't matter", {
   p <- 4
@@ -33,5 +34,5 @@ test_that("outcome/treatment name doesn't matter", {
                                      treated_column_name = 'myt',
                                      outcome_column_name = 'myout')
 })
-
-
+#
+#

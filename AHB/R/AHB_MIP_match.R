@@ -40,12 +40,10 @@
 #'@param outcome_column_name A character with the name of the outcome column in
 #'  holdout and also in data, if supplied in the latter. Defaults to 'outcome'.
 #'
-#'@param black_box Denotes the method to be used to generate outcome model Y. If
-#'  "BART" and cv = F, uses \code{dbarts::bart} with keeptrees = TRUE, keepevery
-#'  = 10, verbose = FALSE, k = 2 and ntree =200 and then the default predict
-#'  method to estimate the outcome. If "BART" and cv = T, k and ntree will be
-#'  best values from cross validation. Defaults to 'BART'. There will be
-#'  multiple choices about black_box in the future.
+#'@param black_box Denotes the method to be used to generate outcome model Y.
+#' If "BART", use bartMachine as ML model to do prediction.
+#' If "xgb, use xgboost as ML model to do prediction.
+#'  Defaults to '"xgb"'.
 #'
 #'@param cv A logical scalar. If \code{TURE}, do cross-validation on the train
 #'  set to generate outcome model Y . Defaults to \code{TRUE}.
@@ -97,18 +95,17 @@
 #'  treated unit.} \item{MGs}{A list of all the matched groups formed by
 #'  AHB_fast_match. For each test treated unit, each row contains all unit_id of
 #'  the other units that fall into its box, including itself. } }
+
 #'@importFrom stats  predict rbinom rnorm var formula runif sd
 #'@importFrom utils combn flush.console read.csv
-#'@importFrom dbarts xbart bart
-#'@import Rcplex
-#'@import Rglpk
 #'@export
+
 
 AHB_MIP_match<-function(data,
                         holdout = 0.1,
                         treated_column_name = 'treated',
                         outcome_column_name = 'outcome',
-                        black_box='BART',
+                        black_box="xgb",
                         cv=F,
                         gamma0=3,
                         gamma1=3,
@@ -118,7 +115,7 @@ AHB_MIP_match<-function(data,
                         n_prune = ifelse(is.numeric(holdout),
                                          round(0.1*(1-holdout) * nrow(data)),
                                          round(0.1*nrow(data))),
-                        MIP_solver = "Rcplex"
+                        MIP_solver = "Rglpk"
                         ){
 
   df <- read_data(data = data, holdout = holdout,
@@ -172,9 +169,22 @@ AHB_MIP_match<-function(data,
 
 
   ## BART
-  fhat1 = colMeans(predict(bart_fit1, newdata = test_covs))
-  fhat0 = colMeans(predict(bart_fit0, newdata = test_covs))
-
+  # fhat1 = colMeans(predict(bart_fit1, newdata = test_covs))
+  # fhat0 = colMeans(predict(bart_fit0, newdata = test_covs))
+  # fhat1 = predict(bart_fit1, test_covs)
+  # fhat0 = predict(bart_fit0, test_covs)
+  fhat1 = 0
+  fhat0 = 0
+  if (black_box=='xgb' | black_box=='LASSO'){
+    fhat1 = predict(bart_fit1, as.matrix(test_covs))
+    fhat0 = predict(bart_fit0, as.matrix(test_covs))
+  }
+  else if(black_box=='BART'){
+    fhat1 = predict(bart_fit1, test_covs)
+    fhat0 = predict(bart_fit0, test_covs)
+  }
+  # print(fhat1)
+  # print(fhat0)
   #MIP
   mip_cates = numeric(n_test_treated[1])
   mip_bins = array(NA, c(n_test_treated, p, 2))
@@ -215,18 +225,27 @@ For now, n_prune = ", n_prune, ". Try to set n_prune below 400 or even smaller")
                                 beta=beta, m=m, M=M)
 
     if(MIP_solver == "Rcplex"){
-      sol <- do.call(Rcplex, c(mip_pars, list(objsense="max", control=list(trace=0))))
+      #The following will enbale users to install MIP_solver optionally
+      if (!requireNamespace("Rcplex", quietly = TRUE)) {
+           warning("The Rcplex package must be installed if you use Rcplex solver")
+           return(NULL)
+       }
+      sol <- do.call(Rcplex::Rcplex, c(mip_pars, list(objsense="max", control=list(trace=0))))
       sol <- sol$xopt
     }
 
     if(MIP_solver == "Rglpk"){
+      if (!requireNamespace("Rglpk", quietly = TRUE)) {
+           warning("The Rglpk package must be installed if you use Rglpk solver")
+           return(NULL)
+       }
       dir = mip_pars$sense
       dir[which(dir =="G")] <- ">="
       dir[which(dir =="L")] <- "<="
       #get bounds
       ind <- 1:length(mip_pars$cvec)
       bounds <- list(lower = list(ind = ind, val = mip_pars$lb), upper = list(ind = ind, val = mip_pars$ub))
-      sol <-Rglpk_solve_LP(obj = mip_pars$cvec, mat = mip_pars$Amat, dir = dir, rhs = mip_pars$bvec,
+      sol <-Rglpk::Rglpk_solve_LP(obj = mip_pars$cvec, mat = mip_pars$Amat, dir = dir, rhs = mip_pars$bvec,
                            bounds = bounds, types = mip_pars$vtype, max = TRUE,control=list(verbose=FALSE, presolve=TRUE))
       sol <- sol$solution
     }

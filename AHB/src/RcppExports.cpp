@@ -6,12 +6,13 @@
 using namespace Rcpp;
 
 // greedy_cpp
-List greedy_cpp(StringVector names, NumericMatrix test_treated_covs, IntegerVector test_control, IntegerVector test_treated, NumericMatrix test_covs, LogicalVector test_treatments, NumericVector test_outcomes, int variation, int n_req_matches, double multiplier, SEXP bart_fit0, SEXP bart_fit1, NumericVector fhat0, NumericVector fhat1, Function expansion_variance_tmp, Function preprocess_cand, Function preprocess_covs, int n_prune);
-RcppExport SEXP _AHB_greedy_cpp(SEXP namesSEXP, SEXP test_treated_covsSEXP, SEXP test_controlSEXP, SEXP test_treatedSEXP, SEXP test_covsSEXP, SEXP test_treatmentsSEXP, SEXP test_outcomesSEXP, SEXP variationSEXP, SEXP n_req_matchesSEXP, SEXP multiplierSEXP, SEXP bart_fit0SEXP, SEXP bart_fit1SEXP, SEXP fhat0SEXP, SEXP fhat1SEXP, SEXP expansion_variance_tmpSEXP, SEXP preprocess_candSEXP, SEXP preprocess_covsSEXP, SEXP n_pruneSEXP) {
+List greedy_cpp(StringVector names, StringVector black_box, NumericMatrix test_treated_covs, IntegerVector test_control, IntegerVector test_treated, NumericMatrix test_covs, LogicalVector test_treatments, NumericVector test_outcomes, int variation, int n_req_matches, double multiplier, SEXP bart_fit0, SEXP bart_fit1, NumericVector fhat0, NumericVector fhat1, Function expansion_variance_tmp, Function preprocess_cand, Function preprocess_covs, int n_prune);
+RcppExport SEXP _AHB_greedy_cpp(SEXP namesSEXP, SEXP black_boxSEXP, SEXP test_treated_covsSEXP, SEXP test_controlSEXP, SEXP test_treatedSEXP, SEXP test_covsSEXP, SEXP test_treatmentsSEXP, SEXP test_outcomesSEXP, SEXP variationSEXP, SEXP n_req_matchesSEXP, SEXP multiplierSEXP, SEXP bart_fit0SEXP, SEXP bart_fit1SEXP, SEXP fhat0SEXP, SEXP fhat1SEXP, SEXP expansion_variance_tmpSEXP, SEXP preprocess_candSEXP, SEXP preprocess_covsSEXP, SEXP n_pruneSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< StringVector >::type names(namesSEXP);
+    Rcpp::traits::input_parameter< StringVector >::type black_box(black_boxSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type test_treated_covs(test_treated_covsSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type test_control(test_controlSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type test_treated(test_treatedSEXP);
@@ -29,13 +30,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Function >::type preprocess_cand(preprocess_candSEXP);
     Rcpp::traits::input_parameter< Function >::type preprocess_covs(preprocess_covsSEXP);
     Rcpp::traits::input_parameter< int >::type n_prune(n_pruneSEXP);
-    rcpp_result_gen = Rcpp::wrap(greedy_cpp(names, test_treated_covs, test_control, test_treated, test_covs, test_treatments, test_outcomes, variation, n_req_matches, multiplier, bart_fit0, bart_fit1, fhat0, fhat1, expansion_variance_tmp, preprocess_cand, preprocess_covs, n_prune));
+    rcpp_result_gen = Rcpp::wrap(greedy_cpp(names, black_box, test_treated_covs, test_control, test_treated, test_covs, test_treatments, test_outcomes, variation, n_req_matches, multiplier, bart_fit0, bart_fit1, fhat0, fhat1, expansion_variance_tmp, preprocess_cand, preprocess_covs, n_prune));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_AHB_greedy_cpp", (DL_FUNC) &_AHB_greedy_cpp, 18},
+    {"_AHB_greedy_cpp", (DL_FUNC) &_AHB_greedy_cpp, 19},
     {NULL, NULL, 0}
 };
 

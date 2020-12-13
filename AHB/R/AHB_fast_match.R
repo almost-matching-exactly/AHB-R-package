@@ -3,7 +3,7 @@
 
 
 #Get the predicted outcomes of sample units in the box we constructed now
-expansion_variance_tmp <- function(name, current_lower, current_upper,
+expansion_variance_tmp <- function(name, black_box, current_lower, current_upper,
                                    proposed_bin, bart_fit0, bart_fit1, n_grid_pts = 8) {
 
   p <- length(current_lower)
@@ -29,7 +29,15 @@ expansion_variance_tmp <- function(name, current_lower, current_upper,
   df<-as.data.frame(M)
   names(df)<-name
   M <-df
-  bin_mean = c(colMeans(predict(bart_fit1, M)),colMeans(predict(bart_fit0, M)))
+  # bin_mean = c(colMeans(predict(bart_fit1, M)),colMeans(predict(bart_fit0, M)))
+  # M <- as.matrix(M)
+  bin_mean = 0
+  if (black_box=='xgb' | black_box=='LASSO'){
+    bin_mean = c(predict(bart_fit1, as.matrix(M)),predict(bart_fit0, as.matrix(M)))
+  }
+  else if (black_box == 'BART'){
+    bin_mean = c(predict(bart_fit1, M),predict(bart_fit0, M))
+  }
 
   bin_mean = matrix(bin_mean, nrow = 2*p, byrow = TRUE)
   return (bin_mean)
@@ -101,12 +109,10 @@ preprocess_covs <- function(cands, test_covs){
 #'@param outcome_column_name A character with the name of the outcome column in
 #'  holdout and also in data, if supplied in the latter. Defaults to 'outcome'.
 #'
-#'@param black_box Denotes the method to be used to generate outcome model Y. If
-#'  "BART" and cv = F, uses \code{dbarts::bart} with keeptrees = TRUE, keepevery
-#'  = 10, verbose = FALSE, k = 2 and ntree =200 and then the default predict
-#'  method to estimate the outcome. If "BART" and cv = T, k and ntree will be
-#'  best values from cross validation. Defaults to 'BART'. There will be
-#'  multiple choices about black_box in the future.
+#'@param black_box Denotes the method to be used to generate outcome model Y.
+#' If "BART", use bartMachine as ML model to do prediction.
+#' If "xgb, use xgboost as ML model to do prediction.
+#'  Defaults to "xgb".
 #'
 #'@param cv A logical scalar. If \code{TURE}, do cross-validation on the train
 #'  set to generate outcome model Y . Defaults to \code{TRUE}.
@@ -135,11 +141,10 @@ preprocess_covs <- function(cands, test_covs){
 #'  \item{MGs}{A list of all the matched groups formed by AHB_fast_match. For
 #'  each test treated unit, each row contains all unit_id of the other units
 #'  that fall into its box, including itself. } }
-#'
-#'
+
+
 #'@importFrom stats  predict rbinom rnorm var formula runif
 #'@importFrom utils combn flush.console
-#'@importFrom dbarts xbart bart
 #'@export
 
 
@@ -147,7 +152,7 @@ AHB_fast_match<-function(data,
                          holdout = 0.1,
                          treated_column_name = 'treated',
                          outcome_column_name = 'outcome',
-                         black_box = 'BART',
+                         black_box = "xgb",
                          cv = F,
                          C = 1.1,
                          n_prune = ifelse(is.numeric(holdout),
@@ -198,10 +203,23 @@ For now, n_prune = ", n_prune, ". Try to set n_prune below 400 or even smaller")
   test_df_treated <- test_df[, which(colnames(test_df) == treated_column_name)]
   test_df_outcome <- test_df[, which(colnames(test_df) == outcome_column_name)]
 
-  fhat1 = colMeans(predict(bart_fit1, newdata = test_covs))
-  fhat0 = colMeans(predict(bart_fit0, newdata = test_covs))
-
-  greedy_out<-greedy_cpp(names(test_covs),as.matrix(test_covs[test_treated, ]), test_control-1, test_treated-1,
+  # fhat1 = colMeans(predict(bart_fit1, newdata = test_covs))
+  # fhat0 = colMeans(predict(bart_fit0, newdata = test_covs))
+  # fhat1 = predict(bart_fit1, test_covs)
+  # fhat0 = predict(bart_fit0, test_covs)
+  fhat1 = 0
+  fhat0 = 0
+  if (black_box=='xgb' | black_box=='LASSO'){
+    fhat1 = predict(bart_fit1, as.matrix(test_covs))
+    fhat0 = predict(bart_fit0, as.matrix(test_covs))
+  }
+  else if(black_box=='BART'){
+    fhat1 = predict(bart_fit1, test_covs)
+    fhat0 = predict(bart_fit0, test_covs)
+  }
+  # print(fhat1)
+  # print(fhat0)
+  greedy_out<-greedy_cpp(names(test_covs),black_box, as.matrix(test_covs[test_treated, ]), test_control-1, test_treated-1,
                          as.matrix(test_covs), as.logical(test_df_treated), test_df_outcome,
                          1, 15, C,bart_fit0, bart_fit1, fhat0, fhat1, expansion_variance_tmp,
                          preprocess_cands, preprocess_covs, n_prune)
