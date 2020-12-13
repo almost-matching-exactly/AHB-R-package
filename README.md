@@ -12,13 +12,12 @@ AHB is a R package for performing matching for observational causal inference on
 
 #### Dependencies
 `AHB` requires R version (>=4.0.0). Install from [here](https://www.r-project.org/) if needed.
-
-- Rcplex (>= 0.3.3)
-- Rglpk (>=0.6.4)
+Required:
 - utils (>=4.0.0)
 - stats (>=4.0.0)
-- dbarts (>=0.9.17)
 - Rcpp (>=1.0.4.6)
+- bartMachine (>=1.2.5.1) or xgboost (>=1.0.0.2)
+- Rcplex (>= 0.3.3) or Rglpk (>=0.6.4)
 
 If your R version does not have these packages, install from [here](https://cran.r-project.org/web/packages/available_packages_by_name.html).
 
