@@ -1,0 +1,140 @@
+{"0": {
+    "doc": "Code to generate documentation for dame-flame",
+    "title": "Code to generate documentation for dame-flame",
+    "content": "# Code to generate documentation for `dame-flame` This directory contains the code for the web site as displayed at https://almost-matching-exactly.github.io/DAME-FLAME-Python-Package/ Please go to that site to view the documentation. ",
+    "url": "http://localhost:4000/AHB-R-package/",
+    "relUrl": "/"
+  },"1": {
+    "doc": "AHB_fast_match",
+    "title": "AHB_fast_match",
+    "content": "AHB_fast_match(data, holdout = 0.1, treated_column_name = \"treated\", outcome_column_name = \"outcome\", black_box = \"BART\", cv = T, C = 0.1) . ",
+    "url": "http://localhost:4000/AHB-R-package/api-documentation/AHB_fast_match",
+    "relUrl": "/api-documentation/AHB_fast_match"
+  },"2": {
+    "doc": "AHB_fast_match",
+    "title": "Parameters",
+    "content": "| data:file, Dataframe, required | If holdout is not a numeric value, this is the data to be matched. If holdout is a numeric scalar between 0 and 1, that proportion of data will be made into a holdout set and only the remaining proportion of data will be matched. | . | holdout:numeric, file, Dataframe, optional (default = 0.1) | Holdout data used to train the outcome model. If a numeric scalar, that proportion of data will be made into a holdout set and only the remaining proportion of data will be matched. Otherwise, if a file path or dataframe is provided, that dataset will serve as the holdout data. | . | treated_column_name:string, optional (default = 'treated') | The name of the column which specifies whether a unit is treated or control. | . | outcome_column_name:string, optional (default = 'outcome') | The name of the column which specifies each unit outcome. | . | black_boxstring, optional (default = 'BART) | Denotes the method to be used to generate outcome model Y. If \"BART\" and cv = F, uses dbarts::bart with keeptrees = TRUE, keepevery = 10, verbose = FALSE, k = 2 and ntree =200 and then the default predict method to estimate the outcome. If \"BART\" and cv = T, k and ntree will be best values from cross validation. Defaults to 'BART'. There will be multiple choices about black_box in the future. | . | cvlogical, optional (default = T) | If TURE, do cross-validation on the train set to generate outcome model Y | . | CA positive scalar, optional (default = 0.1) | Determines the stopping condition for Fast AHB. When the variance in a newly expanded region exceeds C times the variance in the previous expansion region, the algorithm stops. Thus, higher C encourages coarser bins while lower C encourages finer ones. The user should analyze the data with multiple values of C to see how robust results are to its choice. | . ",
+    "url": "http://localhost:4000/AHB-R-package/api-documentation/AHB_fast_match#parameters",
+    "relUrl": "/api-documentation/AHB_fast_match#parameters"
+  },"3": {
+    "doc": "AHB_fast_match",
+    "title": "Returns",
+    "content": "| $data:dataframe | Data set that was matched by AHB_fast_match(). If holdout is not a numeric value, then $data is the same as the data input into AHB_fast_match(). If holdout is a numeric scalar between 0 and 1, $data is the remaining proportion of data that were matched. | . | $units_id:integer vector | A integer vector with unit_id for test treated units | . | $CATE:numeric vector | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in $MGs | . | $bins:numeric vector | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in $MGs | . | $MGs:list | A list of all the matched groups formed by AHB_fast_match(). For each test treated unit, each row contains all unit_id of the other units that fall into its box, including itself. | . ",
+    "url": "http://localhost:4000/AHB-R-package/api-documentation/AHB_fast_match#returns",
+    "relUrl": "/api-documentation/AHB_fast_match#returns"
+  },"4": {
+    "doc": "AHB_MIP_match",
+    "title": "AHB_MIP_match",
+    "content": "AHB_MIP_match(data, holdout = 0.1, treated_column_name = \"treated\", outcome_column_name = \"outcome\", black_box = \"BART\", cv = T, gamma0 = 3, gamma1 = 3, Beta = 2, m = 1, M = 1e+05, n_prune = ifelse(is.numeric(holdout), round(0.1 * (1 - holdout) * nrow(data)), round(0.1 * nrow(data)))) . ",
+    "url": "http://localhost:4000/AHB-R-package/api-documentation/AHB_MIP_match",
+    "relUrl": "/api-documentation/AHB_MIP_match"
+  },"5": {
+    "doc": "AHB_MIP_match",
+    "title": "Parameters",
+    "content": "| data:file, Dataframe, required | If holdout is not a numeric value, this is the data to be matched. If holdout is a numeric scalar between 0 and 1, that proportion of data will be made into a holdout set and only the remaining proportion of data will be matched. | . | holdout:numeric, file, Dataframe, optional (default = 0.1) | Holdout data used to train the outcome model. If a numeric scalar, that proportion of data will be made into a holdout set and only the remaining proportion of data will be matched. Otherwise, if a file path or dataframe is provided, that dataset will serve as the holdout data. | . | treated_column_name:string, optional (default = 'treated') | The name of the column which specifies whether a unit is treated or control. | . | outcome_column_name:string, optional (default = 'outcome') | The name of the column which specifies each unit outcome. | . | black_box:string, optional (default = 'BART) | Denotes the method to be used to generate outcome model Y. If \"BART\" and cv = F, uses dbarts::bart with keeptrees = TRUE, keepevery = 10, verbose = FALSE, k = 2 and ntree =200 and then the default predict method to estimate the outcome. If \"BART\" and cv = T, k and ntree will be best values from cross validation. Defaults to 'BART'. There will be multiple choices about black_box in the future. | . | cv:logical, optional (default = T) | If TURE, do cross-validation on the train set to generate outcome model Y | . | gamma0:A numeric scalar, optional (default = 3) | A numeric value, one of hyperparameters in global MIP that controls the weight placed on the outcome function portion of the loss. | . | gamma1:A numeric scalar, optional (default = 3) | A numeric value, one of hyperparameters in global MIP that controls the weight placed on the outcome function portion of the loss. | . | beta:A numeric scalar, optional (default = 2) | A numeric value, one of hyperparameters in global MIP that controls the weight placed on the outcome function portion of the loss. | . | m:A integer scalar, optional (default = 1) | Determines the at least number of control units that the box contains when estimating causal effects for a single treatment unit. | . | M:A positive integer scalar, optional (default = 1e+5) | Controls the weight placed on decision variable wij, which is an indicator for whether a unit is in the box. | . | n_prune:A positive inetger scalar, optional (default = 0.1* nrow(dataset to be matched)) | Determines the number of candidate units selected to run the mip on for constructing the box. Dataset mentioned below is refered to the dataset for matching. If you match a small dataset with the number of units smaller than 400, it will run MIP on all dataset for each treated unit. If you match larger dataset and your memory of your computer cannot support such much computation, plase adjust n_prune below 400 or even smaller. The smaller number of candidate units selected to run the mip on for constructing the box, the faster this program runs. | . ",
+    "url": "http://localhost:4000/AHB-R-package/api-documentation/AHB_MIP_match#parameters",
+    "relUrl": "/api-documentation/AHB_MIP_match#parameters"
+  },"6": {
+    "doc": "AHB_MIP_match",
+    "title": "Returns",
+    "content": "| $data:dataframe | Data set that was matched by AHB_MIP_match(). If holdout is not a numeric value, then $data is the same as the data input into AHB_MIP_match(). If holdout is a numeric scalar between 0 and 1, $data is the remaining proportion of data that were matched. | . | $units_id:integer vector | A integer vector with unit_id for test treated units | . | $CATE:numeric vector | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in $MGs | . | $bins:numeric vector | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in $MGs | . | $MGs:list | A list of all the matched groups formed by AHB_MIP_match(). For each test treated unit, each row contains all unit_id of the other units that fall into its box, including itself. | . ",
+    "url": "http://localhost:4000/AHB-R-package/api-documentation/AHB_MIP_match#returns",
+    "relUrl": "/api-documentation/AHB_MIP_match#returns"
+  },"7": {
+    "doc": "API Documentation",
+    "title": "API Documentation",
+    "content": " ",
+    "url": "http://localhost:4000/AHB-R-package/api-documentation",
+    "relUrl": "/api-documentation"
+  },"8": {
+    "doc": "ATE",
+    "title": "ATE",
+    "content": "ATE(AHB_out) . ",
+    "url": "http://localhost:4000/AHB-R-package/api-documentation/post-processing/ate",
+    "relUrl": "/api-documentation/post-processing/ate"
+  },"9": {
+    "doc": "ATE",
+    "title": "Parameters",
+    "content": "| AHB_out:file, Dataframe, required | The output of a call to one of the AHB algorithms. | . ",
+    "url": "http://localhost:4000/AHB-R-package/api-documentation/post-processing/ate#parameters",
+    "relUrl": "/api-documentation/post-processing/ate#parameters"
+  },"10": {
+    "doc": "ATE",
+    "title": "Returns",
+    "content": "| ATE:numeric scalar | A numeric sclar representing the estimated average treatment effect (ATE) for the matching data. | . ",
+    "url": "http://localhost:4000/AHB-R-package/api-documentation/post-processing/ate#returns",
+    "relUrl": "/api-documentation/post-processing/ate#returns"
+  },"11": {
+    "doc": "ATT",
+    "title": "ATT",
+    "content": "ATT(AHB_out) . ",
+    "url": "http://localhost:4000/AHB-R-package/api-documentation/post-processing/att",
+    "relUrl": "/api-documentation/post-processing/att"
+  },"12": {
+    "doc": "ATT",
+    "title": "Parameters",
+    "content": "| AHB_out:file, Dataframe, required | The output of a call to one of the AHB algorithms. | . ",
+    "url": "http://localhost:4000/AHB-R-package/api-documentation/post-processing/att#parameters",
+    "relUrl": "/api-documentation/post-processing/att#parameters"
+  },"13": {
+    "doc": "ATT",
+    "title": "Returns",
+    "content": "| ATE:numeric scalar | A numeric sclar representing the estimated average treatment effect on the treated units (ATT) for the matching data. | . ",
+    "url": "http://localhost:4000/AHB-R-package/api-documentation/post-processing/att#returns",
+    "relUrl": "/api-documentation/post-processing/att#returns"
+  },"14": {
+    "doc": "Post Processing",
+    "title": "Post Processing",
+    "content": " ",
+    "url": "http://localhost:4000/AHB-R-package/api-documentation/post-processing",
+    "relUrl": "/api-documentation/post-processing"
+  },"15": {
+    "doc": "Getting Started",
+    "title": "Getting Started",
+    "content": ". | Dependencies | Installation | Input Data Format | Quickstart Example | . ",
+    "url": "http://localhost:4000/AHB-R-package/getting-started",
+    "relUrl": "/getting-started"
+  },"16": {
+    "doc": "Getting Started",
+    "title": "Dependencies",
+    "content": "This package requires prior installation of . | R (&gt;= 3.3) | Cplex (todo: check) | . ",
+    "url": "http://localhost:4000/AHB-R-package/getting-started#dependencies",
+    "relUrl": "/getting-started#dependencies"
+  },"17": {
+    "doc": "Getting Started",
+    "title": "Installation",
+    "content": "The AHB R Package can be installed directly from CRAN: . install.packages('AHB') . ",
+    "url": "http://localhost:4000/AHB-R-package/getting-started#installation",
+    "relUrl": "/getting-started#installation"
+  },"18": {
+    "doc": "Getting Started",
+    "title": "Input Data Format",
+    "content": "To begin using the R-AHB algorithm, first ensure that your dataset is stored as an R Data Frame. Remember, covariates can either be categorical, continuous, or mixed (categorical and continuous). In addition to the covariate columns, your dataset should include a column of binary or logical data types which specify whether a unit is treated (1) or control (0) and a column of numeric data types which specify unit outcomes. Below is a sample dataset in the required format: . | x_1(numeric) | x_2(numeric) | … | x_m(numeric) | treated(binary or logical) | outcome(numeric) | . | 3 | 2.0529 | … | 4.7905 | 1 | 4.5321 | . | 0 | 3.9932 | … | 7.6513 | 0 | 3.3348 | . | … | … | … | … | … | … | . | 1 | 6.9321 | … | 1.5848 | 1 | 6.9320 | . ",
+    "url": "http://localhost:4000/AHB-R-package/getting-started#input-data-format",
+    "relUrl": "/getting-started#input-data-format"
+  },"19": {
+    "doc": "Getting Started",
+    "title": "Quickstart Example",
+    "content": "To generate sample data for exploring AHBs functionality, use the function gen_data as shown below. Remember to load the AHB package a shown in line 1 before calling any of the functions discussed in this section. This example generates a data frame with n = 250 units and p = 5 covariates: . library('AHB') data &lt;- gen_data(n = 250, p = 5) . To run the algorithm, use the AHB_fast_match or AHB_MIP_match function as shown below. The required data parameter can either be a path to a .csv file or a dataframe. In this example, the generated dataframes are used: . library('AHB') AHB_MIP_out &lt;- AHB_MIP_match(data = data, holdout = 1.0, treated_column_name=\"treated\", outcome_column_name=\"outcome\") AHB_fast_out &lt;- AHB_fast_match(data = data, holdout = 1.0, treated_column_name=\"treated\", outcome_column_name=\"outcome\") . Take AHB_fast_out as an example to illustrate the output of the AHB matching algorithms. The object AHB_fast_match is a list of five entries: . | AHB_fast_out$data: | Data set was matched by AHB_fast_match(). If holdout is not a numeric value, then AHB_fast_out$data is the same as the data input into AHB_fast_match(). If holdout is a numeric scalar between 0 and 1, AHB_fast_out$data is the remaining proportion of data that were matched. | . | AHB_fast_out$units_id: | A integer vector with unit_id for test treated units | . | AHB_fast_out$CATE: | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in AHB_fast_out$MGs | . | AHB_fast_out$bins: | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in AHB_fast_out$MGs | . | AHB_fast_out$MGs: | A list of all the matched groups formed by AHB_fast_match(). For each test treated unit, each row contains all unit_id of the other units that fall into its box, including itself. | . To find the average treatment effect (ATE) or average treatment effect on the treated (ATT), use the functions ATE and ATT, respectively, as shown below: . ATE(AHB_out = AHB_fast_out) ATT(AHB_out = AHB_fast_out) . ",
+    "url": "http://localhost:4000/AHB-R-package/getting-started#quickstart-example",
+    "relUrl": "/getting-started#quickstart-example"
+  },"20": {
+    "doc": "Home",
+    "title": "Welcome to the AHB R Package Documentation!",
+    "content": "View us on GitHub . AHB is an R package for performing matching for causal inference on observational datasets containing discrete, continuous, or mixed covariates. AHB matches treatment and control units in unit-specific, hyper-box-shaped regions of the covariate space. This package offers two implementations of the AHB algorithm, one which calculates regions as the solution to a mixed integer program (MIP) and another which uses a fast approximation algorithm. ",
+    "url": "http://localhost:4000/AHB-R-package/#welcome-to-the-ahb-r-package-documentation",
+    "relUrl": "/#welcome-to-the-ahb-r-package-documentation"
+  },"21": {
+    "doc": "Home",
+    "title": "Contact",
+    "content": "Please reach out to let our team know if you’re using this, or if you have any questions! Email us at almost-matching-exactly@duke.edu. ",
+    "url": "http://localhost:4000/AHB-R-package/#contact",
+    "relUrl": "/#contact"
+  },"22": {
+    "doc": "Home",
+    "title": "Home",
+    "content": " ",
+    "url": "http://localhost:4000/AHB-R-package/",
+    "relUrl": "/"
+  }
+}

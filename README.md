@@ -20,7 +20,7 @@ AHB is a R package for performing matching for observational causal inference on
 - dbarts (>=0.9.17)
 - Rcpp (>=1.0.4.6)
 
-If your python version does not have these packages, install from [here](https://cran.r-project.org/web/packages/available_packages_by_name.html).
+If your R version does not have these packages, install from [here](https://cran.r-project.org/web/packages/available_packages_by_name.html).
 
 
 
