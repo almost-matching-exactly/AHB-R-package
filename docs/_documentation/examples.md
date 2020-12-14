@@ -40,7 +40,7 @@ Below is an interactive visualization of a two-dimensional toy dataset which was
 	var data = [treated, control];
 	var layout = {
 		title: {
-			text:"Interactive Hyper-box Example<br><span style='font-size: 14; font-weight: 300'>Click on a treated unit to toggle its hyperbox!</span>",
+			text:"Interactive Hyper-box Example<br><span style='font-size: 14; font-weight: 300'>Click on a treated unit to toggle its hyper-box!</span>",
 			font: {
 				size: 24
 			}
@@ -172,7 +172,7 @@ Below is an interactive visualization of a two-dimensional toy dataset which was
 		modeBarButtonsToRemove: ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d', 'toggleSpikelines', 'hoverCompareCartesian', 'hoverClosestCartesian'],
 		modeBarButtonsToAdd: [
 			{
-				name: 'Show all hyperboxes',
+				name: 'Show all hyper-boxes',
 				icon: eye_solid,
 				click: function(gd) {
 					const update = {};
@@ -185,7 +185,7 @@ Below is an interactive visualization of a two-dimensional toy dataset which was
 				}
 			},
 			{
-				name: 'Hide all hyperboxes',
+				name: 'Hide all hyper-boxes',
 				icon: eye_slash_solid,
 				click: function(gd) {
 					const update = {};
