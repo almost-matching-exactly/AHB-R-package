@@ -37,8 +37,14 @@
   
     {% include head_custom.html %}
 
+    <!-- Google Analytics -->
     {% if jekyll.environment == 'production' %}
     {% include analytics.html %}
     {% endif %}
+    <!-- End Google Analytics -->
+
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- End Plotly.js -->
   
   </head>

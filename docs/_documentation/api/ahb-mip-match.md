@@ -88,7 +88,7 @@ AHB_MIP_match(data, holdout = 0.1, treated_column_name = "treated",
   </tr>
   <tr>
     <td><b>$bins:</b><br/>numeric vector</td>
-    <td>A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in <b><span>$</span>MGs</b></td>
+    <td>An array of two lists where the first list contains the lower bounds and the second list contains the upper bounds for each hyper-box. Each row of each list corresponds to the hyper-box for a test treated unit in <b><span>$</span>units_id.</b></td>
   </tr>
   <tr>
     <td><b>$MGs:</b><br/>list</td>

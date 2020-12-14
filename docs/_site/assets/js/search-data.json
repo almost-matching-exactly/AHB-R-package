@@ -19,7 +19,7 @@
   },"3": {
     "doc": "AHB_fast_match",
     "title": "Returns",
-    "content": "| $data:dataframe | Data set that was matched by AHB_fast_match(). If holdout is not a numeric value, then $data is the same as the data input into AHB_fast_match(). If holdout is a numeric scalar between 0 and 1, $data is the remaining proportion of data that were matched. | . | $units_id:integer vector | A integer vector with unit_id for test treated units | . | $CATE:numeric vector | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in $MGs | . | $bins:numeric vector | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in $MGs | . | $MGs:list | A list of all the matched groups formed by AHB_fast_match(). For each test treated unit, each row contains all unit_id of the other units that fall into its box, including itself. | . ",
+    "content": "| $data:dataframe | Data set that was matched by AHB_fast_match(). If holdout is not a numeric value, then $data is the same as the data input into AHB_fast_match(). If holdout is a numeric scalar between 0 and 1, $data is the remaining proportion of data that were matched. | . | $units_id:integer vector | A integer vector with unit_id for test treated units | . | $CATE:numeric vector | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in $MGs | . | $bins:numeric vector | An array of two lists where the first list contains the lower bounds and the second list contains the upper bounds for each hyper-box. Each row of each list corresponds to the hyper-box for a test treated unit in $units_id. | . | $MGs:list | A list of all the matched groups formed by AHB_fast_match(). For each test treated unit, each row contains all unit_id of the other units that fall into its box, including itself. | . ",
     "url": "http://localhost:4000/AHB-R-package/api-documentation/AHB_fast_match#returns",
     "relUrl": "/api-documentation/AHB_fast_match#returns"
   },"4": {
@@ -37,7 +37,7 @@
   },"6": {
     "doc": "AHB_MIP_match",
     "title": "Returns",
-    "content": "| $data:dataframe | Data set that was matched by AHB_MIP_match(). If holdout is not a numeric value, then $data is the same as the data input into AHB_MIP_match(). If holdout is a numeric scalar between 0 and 1, $data is the remaining proportion of data that were matched. | . | $units_id:integer vector | A integer vector with unit_id for test treated units | . | $CATE:numeric vector | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in $MGs | . | $bins:numeric vector | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in $MGs | . | $MGs:list | A list of all the matched groups formed by AHB_MIP_match(). For each test treated unit, each row contains all unit_id of the other units that fall into its box, including itself. | . ",
+    "content": "| $data:dataframe | Data set that was matched by AHB_MIP_match(). If holdout is not a numeric value, then $data is the same as the data input into AHB_MIP_match(). If holdout is a numeric scalar between 0 and 1, $data is the remaining proportion of data that were matched. | . | $units_id:integer vector | A integer vector with unit_id for test treated units | . | $CATE:numeric vector | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in $MGs | . | $bins:numeric vector | An array of two lists where the first list contains the lower bounds and the second list contains the upper bounds for each hyper-box. Each row of each list corresponds to the hyper-box for a test treated unit in $units_id. | . | $MGs:list | A list of all the matched groups formed by AHB_MIP_match(). For each test treated unit, each row contains all unit_id of the other units that fall into its box, including itself. | . ",
     "url": "http://localhost:4000/AHB-R-package/api-documentation/AHB_MIP_match#returns",
     "relUrl": "/api-documentation/AHB_MIP_match#returns"
   },"7": {
@@ -89,48 +89,54 @@
     "url": "http://localhost:4000/AHB-R-package/api-documentation/post-processing",
     "relUrl": "/api-documentation/post-processing"
   },"15": {
+    "doc": "Examples",
+    "title": "Examples",
+    "content": "Below is an interactive visualization of a two-dimensional toy dataset which was generated with the AHB R Package. Click on a treated unit shown in orange to see a representation of its matched group, which will be depicted as a red box surrounding all of the units in the group. Once selected, the marker for a treated unit will become larger. Click on the marker again to hide the matched group. ",
+    "url": "http://localhost:4000/AHB-R-package/examples",
+    "relUrl": "/examples"
+  },"16": {
     "doc": "Getting Started",
     "title": "Getting Started",
     "content": ". | Dependencies | Installation | Input Data Format | Quickstart Example | . ",
     "url": "http://localhost:4000/AHB-R-package/getting-started",
     "relUrl": "/getting-started"
-  },"16": {
-    "doc": "Getting Started",
-    "title": "Dependencies",
-    "content": "This package requires prior installation of . | R (&gt;= 3.3) | Cplex (todo: check) | . ",
-    "url": "http://localhost:4000/AHB-R-package/getting-started#dependencies",
-    "relUrl": "/getting-started#dependencies"
   },"17": {
     "doc": "Getting Started",
+    "title": "Dependencies",
+    "content": "This package requires prior installation of . | R (&gt;= 3.3) | . ",
+    "url": "http://localhost:4000/AHB-R-package/getting-started#dependencies",
+    "relUrl": "/getting-started#dependencies"
+  },"18": {
+    "doc": "Getting Started",
     "title": "Installation",
-    "content": "The AHB R Package can be installed directly from CRAN: . install.packages('AHB') . ",
+    "content": "The AHB R Package can be downloaded from the almost-matching-exactly Github. To begin using the AHB algorithms in RStudio, go to the Build panel and click “Install and Restart”. For more information on package installation, see RStudio support. ",
     "url": "http://localhost:4000/AHB-R-package/getting-started#installation",
     "relUrl": "/getting-started#installation"
-  },"18": {
+  },"19": {
     "doc": "Getting Started",
     "title": "Input Data Format",
     "content": "To begin using the R-AHB algorithm, first ensure that your dataset is stored as an R Data Frame. Remember, covariates can either be categorical, continuous, or mixed (categorical and continuous). In addition to the covariate columns, your dataset should include a column of binary or logical data types which specify whether a unit is treated (1) or control (0) and a column of numeric data types which specify unit outcomes. Below is a sample dataset in the required format: . | x_1(numeric) | x_2(numeric) | … | x_m(numeric) | treated(binary or logical) | outcome(numeric) | . | 3 | 2.0529 | … | 4.7905 | 1 | 4.5321 | . | 0 | 3.9932 | … | 7.6513 | 0 | 3.3348 | . | … | … | … | … | … | … | . | 1 | 6.9321 | … | 1.5848 | 1 | 6.9320 | . ",
     "url": "http://localhost:4000/AHB-R-package/getting-started#input-data-format",
     "relUrl": "/getting-started#input-data-format"
-  },"19": {
+  },"20": {
     "doc": "Getting Started",
     "title": "Quickstart Example",
-    "content": "To generate sample data for exploring AHBs functionality, use the function gen_data as shown below. Remember to load the AHB package a shown in line 1 before calling any of the functions discussed in this section. This example generates a data frame with n = 250 units and p = 5 covariates: . library('AHB') data &lt;- gen_data(n = 250, p = 5) . To run the algorithm, use the AHB_fast_match or AHB_MIP_match function as shown below. The required data parameter can either be a path to a .csv file or a dataframe. In this example, the generated dataframes are used: . library('AHB') AHB_MIP_out &lt;- AHB_MIP_match(data = data, holdout = 1.0, treated_column_name=\"treated\", outcome_column_name=\"outcome\") AHB_fast_out &lt;- AHB_fast_match(data = data, holdout = 1.0, treated_column_name=\"treated\", outcome_column_name=\"outcome\") . Take AHB_fast_out as an example to illustrate the output of the AHB matching algorithms. The object AHB_fast_match is a list of five entries: . | AHB_fast_out$data: | Data set was matched by AHB_fast_match(). If holdout is not a numeric value, then AHB_fast_out$data is the same as the data input into AHB_fast_match(). If holdout is a numeric scalar between 0 and 1, AHB_fast_out$data is the remaining proportion of data that were matched. | . | AHB_fast_out$units_id: | A integer vector with unit_id for test treated units | . | AHB_fast_out$CATE: | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in AHB_fast_out$MGs | . | AHB_fast_out$bins: | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in AHB_fast_out$MGs | . | AHB_fast_out$MGs: | A list of all the matched groups formed by AHB_fast_match(). For each test treated unit, each row contains all unit_id of the other units that fall into its box, including itself. | . To find the average treatment effect (ATE) or average treatment effect on the treated (ATT), use the functions ATE and ATT, respectively, as shown below: . ATE(AHB_out = AHB_fast_out) ATT(AHB_out = AHB_fast_out) . ",
+    "content": "To generate sample data for exploring AHBs functionality, use the function gen_data as shown below. Remember to load the AHB package a shown in line 1 before calling any of the functions discussed in this section. This example generates a data frame with n = 250 units and p = 5 covariates: . data &lt;- gen_data(n = 250, p = 5) . To run the algorithm, use the AHB_fast_match or AHB_MIP_match function as shown below. The required data parameter can either be a path to a .csv file or a dataframe. In this example, the generated dataframes are used: . AHB_MIP_out &lt;- AHB_MIP_match(data = data, holdout = 1.0, treated_column_name=\"treated\", outcome_column_name=\"outcome\") AHB_fast_out &lt;- AHB_fast_match(data = data, holdout = 1.0, treated_column_name=\"treated\", outcome_column_name=\"outcome\") . Take AHB_fast_out as an example to illustrate the output of the AHB matching algorithms. The object AHB_fast_match is a list of five entries: . | AHB_fast_out$data: | Data set was matched by AHB_fast_match(). If holdout is not a numeric value, then AHB_fast_out$data is the same as the data input into AHB_fast_match(). If holdout is a numeric scalar between 0 and 1, AHB_fast_out$data is the remaining proportion of data that were matched. | . | AHB_fast_out$units_id: | A integer vector with unit_id for test treated units | . | AHB_fast_out$CATE: | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in AHB_fast_out$MGs | . | AHB_fast_out$bins: | An array of two lists where the first list contains the lower bounds and the second list contains the upper bounds for each hyper-box. Each row of each list corresponds to the hyper-box for a test treated unit in AHB_fast_out$units_id. | . | AHB_fast_out$MGs: | A list of all the matched groups formed by AHB_fast_match(). For each test treated unit, each row contains all unit_id of the other units that fall into its box, including itself. | . To find the average treatment effect (ATE) or average treatment effect on the treated (ATT), use the functions ATE and ATT, respectively, as shown below: . ATE(AHB_out = AHB_fast_out) ATT(AHB_out = AHB_fast_out) . ",
     "url": "http://localhost:4000/AHB-R-package/getting-started#quickstart-example",
     "relUrl": "/getting-started#quickstart-example"
-  },"20": {
+  },"21": {
     "doc": "Home",
     "title": "Welcome to the AHB R Package Documentation!",
     "content": "View us on GitHub . AHB is an R package for performing matching for causal inference on observational datasets containing discrete, continuous, or mixed covariates. AHB matches treatment and control units in unit-specific, hyper-box-shaped regions of the covariate space. This package offers two implementations of the AHB algorithm, one which calculates regions as the solution to a mixed integer program (MIP) and another which uses a fast approximation algorithm. ",
     "url": "http://localhost:4000/AHB-R-package/#welcome-to-the-ahb-r-package-documentation",
     "relUrl": "/#welcome-to-the-ahb-r-package-documentation"
-  },"21": {
+  },"22": {
     "doc": "Home",
     "title": "Contact",
     "content": "Please reach out to let our team know if you’re using this, or if you have any questions! Email us at almost-matching-exactly@duke.edu. ",
     "url": "http://localhost:4000/AHB-R-package/#contact",
     "relUrl": "/#contact"
-  },"22": {
+  },"23": {
     "doc": "Home",
     "title": "Home",
     "content": " ",

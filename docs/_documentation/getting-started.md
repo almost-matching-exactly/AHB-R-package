@@ -21,15 +21,9 @@ permalink: /getting-started
 ## Dependencies
 This package requires prior installation of
 - R (>= 3.3)
-- Cplex (todo: check)
 
 ## Installation
-The AHB R Package can be installed directly from CRAN:
-<div class="code-example" markdown="1">
-```r
-install.packages('AHB')
-```
-</div>
+The AHB R Package can be downloaded from the [almost-matching-exactly Github](https://github.com/almost-matching-exactly/AHB-R-package). To begin using the AHB algorithms in RStudio, go to the Build panel and click "Install and Restart". For more information on package installation, see [RStudio support](https://support.rstudio.com/hc/en-us/articles/200486508-Building-Testing-and-Distributing-Packages).
 
 ## Input Data Format
 To begin using the R-AHB algorithm, first ensure that your dataset is stored as an **R Data Frame**. Remember, covariates can either be categorical, continuous, or mixed (categorical and continuous). In addition to the covariate columns, your dataset should include a column of *binary* or *logical* data types which specify whether a unit is treated (1) or control (0) and a column of numeric data types which specify unit outcomes. Below is a sample dataset in the required format:
@@ -47,8 +41,6 @@ Remember to load the `AHB` package a shown in line 1 before calling any of the f
 in this section. This example generates a data frame with n = 250 units and p = 5 covariates:
 <div class="code-example" markdown="1">
 ```r
-library('AHB')
-
 data <- gen_data(n = 250, p = 5)
 ```
 </div>
@@ -57,8 +49,6 @@ To run the algorithm, use the `AHB_fast_match` or `AHB_MIP_match` function as sh
 either be a path to a .csv file or a dataframe. In this example, the generated dataframes are used:
 <div class="code-example" markdown="1">
 ```r
-library('AHB')
-
 AHB_MIP_out <- AHB_MIP_match(data = data, holdout = 1.0, treated_column_name="treated", outcome_column_name="outcome")
 AHB_fast_out <- AHB_fast_match(data = data, holdout = 1.0, treated_column_name="treated", outcome_column_name="outcome")
 ```
@@ -68,7 +58,7 @@ Take **AHB_fast_out** as an example to illustrate the output of the AHB matching
 | AHB_fast_out$data:     | Data set was matched by AHB_fast_match(). If holdout is not a numeric value, then AHB_fast_out<span>$</span>data is the same as the data input into AHB_fast_match(). If holdout is a numeric scalar between 0 and 1, AHB_fast_out<span>$</span>data is the remaining proportion of data that were matched. |
 | AHB_fast_out$units_id: | A integer vector with unit_id for test treated units                                                                                                                                                                                                                             |
 | AHB_fast_out$CATE:     | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in AHB_fast_out$MGs                                                                                                                                    |
-| AHB_fast_out$bins:     | A numeric vector with the conditional average treatment effect estimates for every test treated unit in its matched group in AHB_fast_out$MGs                                                                                                                                    |
+| AHB_fast_out$bins:     | An array of two lists where the first list contains the lower bounds and the second list contains the upper bounds for each hyper-box. Each row of each list corresponds to the hyper-box for a test treated unit in AHB_fast_out<span>$</span>units_id. |
 | AHB_fast_out$MGs:      | A list of all the matched groups formed by AHB_fast_match(). For each test treated unit, each row contains all unit_id of the other units that fall into its box, including itself. 
 
 To find the average treatment effect (ATE) or average treatment effect on the treated (ATT), use 

@@ -2249,6 +2249,8 @@ figure.highlight pre, figure.highlight code { padding: 0; margin: 0; border: 0; 
   .text-small { font-size: 8pt !important; }
   pre.highlight { border: 1px solid #44434d; }
   .main { max-width: none; margin-left: 0; } }
+div.graph { margin-left: auto; margin-right: auto; margin-top: 30px; margin-bottom: 15px; }
+
 table.parameters td:first-child { width: 35%; }
 
 .code-example { padding: 0rem; }
