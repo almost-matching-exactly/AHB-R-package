@@ -11,10 +11,11 @@ permalink: /examples
 
 Below is an interactive visualization of a two-dimensional toy dataset which was generated with the AHB R Package. Click on a treated unit shown in orange to see a representation of its matched group, which will be depicted as a red box surrounding all of the units in the group. Once selected, the marker for a treated unit will become larger. Click on the marker again to hide the matched group.
 
-<div class="graph" id="tester" style="width:600px;height:400px;"></div>
+<div class="graph" id="example1"></div>
+<div class="caption">This graph was created using <a href="https://plotly.com/javascript/">Plotly.js</a> and icons provided by <a href="https://fontawesome.com/">Font Awesome</a>.</div>
 
 <script>
-	TESTER = document.getElementById('tester');
+	EXAMPLE1 = document.getElementById('example1');
 	var treated = {
 		x: [-0.9660798,  3.2802848,  2.3606708, -4.2075829, 3.9428443,  2.2230314, -1.0307580, -1.1262030],
 		y: [2.20054788, -2.08015919, -1.68417799, -0.35666177,  0.21815098,  0.14764699,  4.90472471, 0.52658809],
@@ -180,8 +181,8 @@ Below is an interactive visualization of a two-dimensional toy dataset which was
 						update['shapes[' + i + '].visible'] = true;
 						treated.marker.size[i] = 15;
 					}
-					Plotly.relayout(TESTER, update);
-					Plotly.restyle(TESTER, treated.marker);
+					Plotly.relayout(EXAMPLE1, update);
+					Plotly.restyle(EXAMPLE1, treated.marker);
 				}
 			},
 			{
@@ -193,25 +194,26 @@ Below is an interactive visualization of a two-dimensional toy dataset which was
 						update['shapes[' + i + '].visible'] = false;
 						treated.marker.size[i] = 10;
 					}
-					Plotly.relayout(TESTER, update);
-					Plotly.restyle(TESTER, treated.marker);
+					Plotly.relayout(EXAMPLE1, update);
+					Plotly.restyle(EXAMPLE1, treated.marker);
 				}
 			}
 		],
-		displaylogo: false
+		displaylogo: false,
+		responsive: true
 	};
-	Plotly.newPlot(TESTER, data, layout, config);
+	Plotly.newPlot(EXAMPLE1, data, layout, config);
 
-	TESTER.on('plotly_click', function(array) {
+	EXAMPLE1.on('plotly_click', function(array) {
 		if (array.points[0].data.name === 'treated') {
 			const update = {};
 			var index = array.points[0].pointIndex;
 			var key = 'shapes[' + index + '].visible';
 			update[key] = !layout.shapes[index].visible;
-			Plotly.relayout(TESTER, update);
+			Plotly.relayout(EXAMPLE1, update);
 
 			treated.marker.size[index] = treated.marker.size[index] === 10 ? 15 : 10;
-			Plotly.restyle(TESTER, treated.marker);
+			Plotly.restyle(EXAMPLE1, treated.marker);
 		}
 	});
 </script>
