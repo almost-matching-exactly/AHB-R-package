@@ -4,12 +4,12 @@
 
 #Get the predicted outcomes of sample units in the box we constructed now
 expansion_variance_tmp <- function(name, black_box, current_lower, current_upper,
-                                   proposed_bin, bart_fit0, bart_fit1, n_grid_pts = 8) {
-
+                                   proposed_bin,user_PE_fit, user_PE_predict,PE_predict,
+                                   bart_fit0, bart_fit1, n_grid_pts = 8) {
+  # PE_predict_params <- pkg.env$PE_predict_params
   p <- length(current_lower)
   n <-n_grid_pts*p*p
   M <- matrix(c(1:n), nrow = n_grid_pts*p, byrow = TRUE)
-
   #Get the sample data in the box
   for(cov in 1:p){
     new_val = proposed_bin[cov]
@@ -25,26 +25,23 @@ expansion_variance_tmp <- function(name, black_box, current_lower, current_upper
     M[start_r:end_r,] <- pred_data
   }
 
-
   df<-as.data.frame(M)
   names(df)<-name
   M <-df
-  # bin_mean = c(colMeans(predict(bart_fit1, M)),colMeans(predict(bart_fit0, M)))
-  # M <- as.matrix(M)
   bin_mean = 0
-  if (black_box=='xgb' | black_box=='LASSO'){
-    bin_mean = c(predict(bart_fit1, as.matrix(M)),predict(bart_fit0, as.matrix(M)))
+  fhat1 <- do.call(PE_predict, c(list(bart_fit1, as.matrix(M)), PE_predict_params))
+  fhat0 <- do.call(PE_predict, c(list(bart_fit0, as.matrix(M)), PE_predict_params))
+  if(black_box=='BART' && is.null(user_PE_predict) && is.null(user_PE_fit)){
+    fhat1<- colMeans(fhat1)
+    fhat0<- colMeans(fhat0)
   }
-  else if (black_box == 'BART'){
-    bin_mean = c(predict(bart_fit1, M),predict(bart_fit0, M))
-  }
-
+  bin_mean = c(fhat1,fhat0)
   bin_mean = matrix(bin_mean, nrow = 2*p, byrow = TRUE)
   return (bin_mean)
 }
 
 
-
+#Construct a matched group with covs and lower and higher bounds
 make_mg <- function(X, lbs, ubs){
   return(which(colMeans((t(X) <= ubs)*(t(X) >= lbs))==1))
 }
@@ -109,10 +106,27 @@ preprocess_covs <- function(cands, test_covs){
 #'@param outcome_column_name A character with the name of the outcome column in
 #'  holdout and also in data, if supplied in the latter. Defaults to 'outcome'.
 #'
-#'@param black_box Denotes the method to be used to generate outcome model Y.
-#' If "BART", use bartMachine as ML model to do prediction.
+#'@param PE_method Denotes the method to be used to generate outcome model Y.
+#' If "BART", use bart in dbarts as ML model to do prediction.
 #' If "xgb, use xgboost as ML model to do prediction.
-#'  Defaults to "xgb".
+#'  Defaults to "BART".
+#'
+#' @param user_PE_fit An optional function supplied by the user that can be used
+#'   instead of those allowed for by \code{PE_method} to fit a model for the
+#'   outcome from the covariates. Must take in a matrix of covariates as its
+#'   first argument and a vector outcome as its second argument. Defaults to
+#'   \code{NULL}.
+#' @param user_PE_fit_params A named list of optional parameters to be used by
+#'   \code{user_PE_fit}. Defaults to \code{NULL}.
+#' @param user_PE_predict An optional function supplied by the user that can be
+#'   used to generate predictions from the output of \code{user_PE_fit}. As its
+#'   first argument, must take an object of the type returned by
+#'  \code{user_PE_fit} and as its second, a matrix of values for which to
+#'  generate predictions. When the outcome is binary or multi-class, must
+#'  return the maximum probability class label. If not supplied,
+#'  defaults to \code{predict}.
+#' @param user_PE_predict_params A named list of optional parameters to be used
+#'   by \code{user_PE_predict}. Defaults to \code{NULL}.
 #'
 #'@param cv A logical scalar. If \code{TURE}, do cross-validation on the train
 #'  set to generate outcome model Y . Defaults to \code{TRUE}.
@@ -123,28 +137,55 @@ preprocess_covs <- function(cands, test_covs){
 #'  encourages coarser bins while lower C encourages finer ones. The user should
 #'  analyze the data with multiple values of C to see how robust results are to
 #'  its choice.
-#'@param n_prune A numeric value, the number of candidate units selected to
-#'  construct the box. Defualt n_prune = 50.
+#'@param n_prune A numeric value, the number of candidate units selected to run
+#'  the mip on for constructing the box. Dataset mentioned below is refered to
+#'  the dataset for matching. If you match a small dataset with the number of
+#'  units smaller than 400, it will run MIP on all dataset for each treated
+#'  unit. If you match larger dataset and your memory of your computer cannot
+#'  support such much computation, plase adjust n_prune below 400 or even
+#'  smaller. The smaller number of candidate units selected to run the mip on
+#'  for constructing the box, the faster this program runs.Defualt n_prune =
+#'  0.1* nrow(dataset).
 #'
-#'@return The basic object returned by \code{AHB_fast_match} is a list of 5
-#'  entries: \describe{\item{data}{Data set was matched by
-#'  \code{AHB_fast_match}. If holdout is not a numeric value, the
-#'  \code{AHB_fast_out$data} is the same as the data input into
-#'  \code{AHB_fast_match}.  If holdout is a numeric scalar between 0 and 1,
-#'  \code{AHB_fast_out$data} is the remaining proportion of data that were
-#'  matched.} \item{units_id}{A integer vector with unit_id for test treated
-#'  units} \item{CATE}{A numeric vector with the conditional average treatment
-#'  effect estimates for every test treated unit in its matched group in
-#'  \code{MGs}} \item{bins}{ An array of two lists where the first one contains
-#'  lower bounds and the other contains upper bounds for each test treated unit.
-#'  Each row of each list is a vector corresponding to a test treated unit.}
-#'  \item{MGs}{A list of all the matched groups formed by AHB_fast_match. For
-#'  each test treated unit, each row contains all unit_id of the other units
-#'  that fall into its box, including itself. } }
+#'
+#' @param missing_data Specifies how to handle missingness in \code{data}. If
+#'   'none' (default), assumes no missing data; if 'drop', effectively drops
+#'   units with missingness from the data and does not match them;
+#'   if 'impute', imputes the missing data via \code{mice::mice}.
+#' @param missing_holdout Specifies how to handle missingness in \code{holdout}.
+#'   If 'none' (default), assumes no missing data; if 'drop', effectively drops
+#'   units with missingness and does not use them to compute PE; and if 'impute',
+#'   imputes the missing data via \code{mice::mice}. In this last case, the PE
+#'   at an iteration will be given by the average PE across all imputations.
+#' @param impute_with_treatment A logical scalar. If \code{TRUE}, uses treatment
+#'   assignment to impute covariates when \code{missing_data = 'impute'} or
+#'   \code{missing_holdout = 'impute'}. Defaults to \code{TRUE}.
+#' @param impute_with_outcome A logical scalar. If \code{TRUE}, uses outcome
+#'   information to impute covariates when \code{missing_data = 'impute'} or
+#'   \code{missing_holdout = 'impute'}. Defaults to \code{FALSE}.
+#'
+#'@return The basic object returned by \code{AHB_MIP_match} is a list of 5
+#'  entries: \describe{\item{data}{Clean data set after preprocessing was matched by \code{AHB_MIP_match}.
+#'  If holdout is not a numeric value, the \code{AHB_MIP_out$data} is the same
+#'  as the data input into \code{AHB_MIP_match}.  If holdout is a numeric scalar
+#'  between 0 and 1, \code{AHB_MIP_out$data} is the remaining proportion of data
+#'  that were matched.}
+#'  \item{data_dummy}{This is dummy version of \code{data}. AHB will convert all categorical data into dummies}
+#'   \item{units_id}{A integer vector with unit_id for test
+#'  treated units} \item{CATE}{A numeric vector with the conditional average
+#'  treatment effect estimates for every test treated unit in its matched group
+#'  in \code{MGs}} \item{bins}{ An array of two lists where the first one
+#'  contains lower bounds and the other contains upper bounds for each test
+#'  treated unit. Each row of each list is a vector corresponding to a test
+#'  treated unit.} \item{MGs}{A list of all the matched groups formed by
+#'  AHB_fast_match. For each test treated unit, each row contains all unit_id of
+#'  the other units that fall into its box, including itself. } }
+#'  \item{list_dummyCols}{This is a list of dummy cols after mapping}
+#'  \item{verbose}{This is used for postprocessing. Contains \code{treated_column_name} and \code{outcome_column_name}}
 
-
-#'@importFrom stats  predict rbinom rnorm var formula runif
+#'@importFrom stats  predict rbinom rnorm var formula runif complete.cases
 #'@importFrom utils combn flush.console
+#'@import fastDummies
 #'@export
 
 
@@ -152,41 +193,51 @@ AHB_fast_match<-function(data,
                          holdout = 0.1,
                          treated_column_name = 'treated',
                          outcome_column_name = 'outcome',
-                         black_box = "xgb",
+                         PE_method = "BART",
+                         user_PE_fit = NULL, user_PE_fit_params = NULL,
+                         user_PE_predict = NULL, user_PE_predict_params = NULL,
                          cv = F,
                          C = 1.1,
                          n_prune = ifelse(is.numeric(holdout),
                                           round(0.1*(1-holdout) * nrow(data)),
-                                          round(0.1*nrow(data)))){
+                                          round(0.1*nrow(data))),
+                         missing_data = 'none', missing_holdout = 'none',
+                         impute_with_treatment = TRUE, impute_with_outcome = FALSE
+                         ){
 
-  df <- read_data(data,holdout,treated_column_name,outcome_column_name)
-  check_args_fast(data = df[[1]],holdout = df[[2]],
-                  treated_column_name=treated_column_name, outcome_column_name=outcome_column_name,
-                  black_box = black_box, cv = cv, C = C)
+  df <- read_data(data,holdout)
+  check_args_fast(df[[1]],df[[2]], treated_column_name, outcome_column_name,
+                 PE_method, user_PE_fit, user_PE_fit_params,
+                 user_PE_predict, user_PE_predict_params,cv,C,n_prune)
 
-  inputs <- estimator_inputs(df[[2]], df[[1]],
-                             treated_column_name = treated_column_name, outcome_column_name = outcome_column_name,
-                             black_box = black_box, cv = cv)
+  df[[2]] <- mapCategoricalToFactor(df[[2]],treated_column_name, outcome_column_name)
+  df[[1]] <- mapCategoricalToFactor(df[[1]],treated_column_name, outcome_column_name)
+  train_ <-handle_missing(df[[2]], "training dataset", missing_holdout,
+                          treated_column_name, outcome_column_name,
+                          impute_with_treatment, impute_with_outcome)
+  test_ <- handle_missing(df[[1]], "testing dataset", missing_data,
+                          treated_column_name, outcome_column_name,
+                          impute_with_treatment, impute_with_outcome)
+  map1<- mapFactorToDummy(train_, treated_column_name, outcome_column_name)
+  train_dummy<- map1[[1]]
+  list_dummyCols <- map1[[2]]
+  test_dummy <- mapFactorToDummy(test_, treated_column_name, outcome_column_name)[[1]]
 
-  f <- inputs[[1]]
-  n <- inputs[[2]]
-  n_train <- inputs[[3]]
-  p <- inputs[[4]]
-  train_df <- inputs[[5]]
-  train_covs <- inputs[[6]]
-  train_control <- inputs[[7]]
+  inputs <- estimator_inputs(train_df = train_dummy, test_df = test_dummy,
+                             user_PE_fit = user_PE_fit, user_PE_fit_params = user_PE_fit_params,
+                             user_PE_predict = user_PE_predict, user_PE_predict_params = user_PE_predict_params,
+                             treated_column_name= treated_column_name, outcome_column_name=outcome_column_name,
+                             black_box =  PE_method, cv = cv)
 
-  train_treated <- inputs[[8]]
-  test_df <- inputs[[9]]
-  test_covs <- inputs[[10]]
-  test_control <- inputs[[11]]
-  test_treated <- inputs[[12]]
-  n_test_control <- inputs[[13]]
-  n_test_treated <- inputs[[14]]
-  bart_fit0 <- inputs[[15]]
-  bart_fit1 <- inputs[[16]]
-  #counterfactuals <- inputs[[17]]
-
+  p = inputs[[4]]
+  test_df = inputs[[9]]
+  test_covs = inputs[[10]]
+  test_control = inputs[[11]]
+  test_treated = inputs[[12]]
+  n_test_control = inputs[[13]]
+  n_test_treated = inputs[[14]]
+  bart_fit0 = inputs[[15]]
+  bart_fit1 = inputs[[16]]
 
   message("Running AHB_fast_matching")
 
@@ -202,26 +253,26 @@ For now, n_prune = ", n_prune, ". Try to set n_prune below 400 or even smaller")
   #Greedy
   test_df_treated <- test_df[, which(colnames(test_df) == treated_column_name)]
   test_df_outcome <- test_df[, which(colnames(test_df) == outcome_column_name)]
-
-  # fhat1 = colMeans(predict(bart_fit1, newdata = test_covs))
-  # fhat0 = colMeans(predict(bart_fit0, newdata = test_covs))
-  # fhat1 = predict(bart_fit1, test_covs)
-  # fhat0 = predict(bart_fit0, test_covs)
   fhat1 = 0
   fhat0 = 0
-  if (black_box=='xgb' | black_box=='LASSO'){
-    fhat1 = predict(bart_fit1, as.matrix(test_covs))
-    fhat0 = predict(bart_fit0, as.matrix(test_covs))
+  PE_predict <- predict
+  PE_predict_params <- user_PE_predict_params
+  assign("PE_predict_params", PE_predict_params, envir = .GlobalEnv)# Make PE_predict_params as globalEnv for greedy_cpp
+
+  if(!is.null(user_PE_predict)){
+    PE_predict <- user_PE_predict
   }
-  else if(black_box=='BART'){
-    fhat1 = predict(bart_fit1, test_covs)
-    fhat0 = predict(bart_fit0, test_covs)
+  fhat1 <- do.call(PE_predict, c(list(bart_fit1, as.matrix(test_covs)), PE_predict_params))
+  fhat0 <- do.call(PE_predict, c(list(bart_fit0, as.matrix(test_covs)), PE_predict_params))
+  if(PE_method=='BART' && is.null(user_PE_predict) && is.null(user_PE_fit)){
+    fhat1<- colMeans(fhat1)
+    fhat0<- colMeans(fhat0)
   }
-  # print(fhat1)
-  # print(fhat0)
-  greedy_out<-greedy_cpp(names(test_covs),black_box, as.matrix(test_covs[test_treated, ]), test_control-1, test_treated-1,
+
+  greedy_out<-greedy_cpp(names(test_covs),PE_method, as.matrix(test_covs[test_treated, ]), test_control-1, test_treated-1,
                          as.matrix(test_covs), as.logical(test_df_treated), test_df_outcome,
-                         1, 15, C,bart_fit0, bart_fit1, fhat0, fhat1, expansion_variance_tmp,
+                         1, 15, C,user_PE_fit, user_PE_predict, PE_predict, bart_fit0, bart_fit1,
+                         fhat0, fhat1, expansion_variance_tmp,
                          preprocess_cands, preprocess_covs, n_prune)
 
   fast_cates <- greedy_out[[1]]
@@ -229,9 +280,8 @@ For now, n_prune = ", n_prune, ". Try to set n_prune below 400 or even smaller")
   upper_bounds <- do.call(rbind, greedy_out[[3]])
   fast_bins <- array(c(lower_bounds, upper_bounds), dim = c(dim(lower_bounds), 2))
   MGs <- greedy_out[[4]]
-
   end_time <- Sys.time()
   t = difftime(end_time, start_time, units = "auto")
   message(paste0("Time to match ", length(test_treated), " units: ", format(round(t, 2), nsmall = 2) ))
-  return(list(data = test_df, units_id = test_treated, CATE = fast_cates, bins = fast_bins, MGs = MGs, verbose = c(treated_column_name,outcome_column_name)))
+  return(list(data = test_, data_dummy = test_df,treated_unit_ids = test_treated, CATE = fast_cates, bins = fast_bins, MGs = MGs,list_dummyCols = list_dummyCols, verbose = c(treated_column_name,outcome_column_name)))
 }

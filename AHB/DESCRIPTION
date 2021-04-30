@@ -37,7 +37,8 @@ LazyData: true
 Imports: 
     stats,
     Rcpp,
-    utils
+    utils,
+    fastDummies
 RoxygenNote: 7.1.0
 LinkingTo: 
     Rcpp
@@ -49,5 +50,9 @@ Suggests:
     testthat,
     glmnet,
     bartMachine,
-    xgboost
+    dbarts,
+    mice,
+    assert,
+    xgboost,
+    covr
 VignetteBuilder: knitr

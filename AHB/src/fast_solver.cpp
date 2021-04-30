@@ -52,7 +52,8 @@ double get_mean(NumericVector array){
 // [[Rcpp::export]]
 List greedy_cpp(StringVector names,StringVector black_box ,NumericMatrix test_treated_covs, IntegerVector test_control, IntegerVector test_treated,
                 NumericMatrix test_covs, LogicalVector test_treatments, NumericVector test_outcomes,
-                int variation, int n_req_matches, double multiplier, SEXP bart_fit0, SEXP bart_fit1,
+                int variation, int n_req_matches, double multiplier,
+                SEXP user_PE_fit, SEXP user_PE_predict,SEXP PE_predict, SEXP bart_fit0, SEXP bart_fit1,
                 NumericVector fhat0, NumericVector fhat1, Function expansion_variance_tmp,
                 Function preprocess_cand,Function preprocess_covs,int n_prune) {
 
@@ -152,7 +153,7 @@ List greedy_cpp(StringVector names,StringVector black_box ,NumericMatrix test_tr
       }
       // 3. Test this new bin
       // Find a sample of data in the box we have now, and get the predicted outcomes
-      NumericMatrix pred_outcomes = Rcpp::as<NumericMatrix>(expansion_variance_tmp(names,black_box,A, B, proposed_bin, bart_fit0, bart_fit1, 3));
+      NumericMatrix pred_outcomes = Rcpp::as<NumericMatrix>(expansion_variance_tmp(names,black_box,A, B, proposed_bin,user_PE_fit,user_PE_predict, PE_predict, bart_fit0, bart_fit1, 3));
 
       //get bin variance of the box
       for(int x = 0; x < p; x++){if(bin_var[x] != R_PosInf){bin_var[x] = get_var(pred_outcomes(x, _)) + get_var(pred_outcomes(x+p, _));}}
