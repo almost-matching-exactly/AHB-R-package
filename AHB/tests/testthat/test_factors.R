@@ -6,8 +6,8 @@ test_that("holdout is not offered by users", {
   MIP_out <- AHB_MIP_match(data = data, holdout = 0.5)
 })
 
-#
-#
+
+
 test_that("Cross validation", {
   p <- 4
   data <- gen_data(n_units = 100, p = p)
@@ -23,8 +23,8 @@ test_that("Hpyerparameters for Fast", {
   fast_out <- AHB_fast_match(data = data, holdout = 0.5, C = 2)
 })
 
+
 #
-# #
 test_that("Rglpk for MIP", {
   p <- 4
   data <- gen_data(n_units = 100, p = p)
@@ -40,9 +40,9 @@ test_that("Rglpk for MIP", {
 test_that("black_box", {
   p <- 4
   data <- gen_data(n_units = 100, p = p)
-  fast_out <- AHB_fast_match(data = data, holdout = 0.5,black_box="xgb")
-  fast_out <- AHB_fast_match(data = data, holdout = 0.5,black_box="BART")
-  MIP_out <- AHB_MIP_match(data = data, holdout = 0.5, black_box="BART")
-  MIP_out <- AHB_MIP_match(data = data, holdout = 0.5, black_box="xgb")
+  fast_out <- AHB_fast_match(data = data, holdout = 0.5,PE_method="xgb")
+  fast_out <- AHB_fast_match(data = data, holdout = 0.5,PE_method="BART")
+  MIP_out <- AHB_MIP_match(data = data, holdout = 0.5, PE_method="BART")
+  MIP_out <- AHB_MIP_match(data = data, holdout = 0.5, PE_method="xgb")
 
 })

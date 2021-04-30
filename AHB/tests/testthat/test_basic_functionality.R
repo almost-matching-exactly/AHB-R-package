@@ -17,6 +17,7 @@ test_that("column order doesn't matter", {
 })
 
 test_that("outcome/treatment name doesn't matter", {
+
   p <- 4
   data <- gen_data(n_units = 50, p = p)
   holdout <-  gen_data(n_units = 50, p = p)
@@ -33,6 +34,7 @@ test_that("outcome/treatment name doesn't matter", {
   renamed_MIP_out <- AHB_MIP_match(data = renamed_data, holdout = renamed_holdout,
                                      treated_column_name = 'myt',
                                      outcome_column_name = 'myout')
+
 })
 #
 #

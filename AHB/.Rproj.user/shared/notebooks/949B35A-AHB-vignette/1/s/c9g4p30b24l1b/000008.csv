@@ -1,0 +1,4 @@
+"0","AHB_fast_out <- AHB_fast_match(data = data, holdout = holdout)"
+"2","Error in check_treat_col_type(data, data_cols, treated_column_name) : 
+  Treated variable in data must be numeric binary or logical.
+"

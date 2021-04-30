@@ -9,7 +9,11 @@ AHB_MIP_match(
   holdout = 0.1,
   treated_column_name = "treated",
   outcome_column_name = "outcome",
-  black_box = "xgb",
+  PE_method = "xgb",
+  user_PE_fit = NULL,
+  user_PE_fit_params = NULL,
+  user_PE_predict = NULL,
+  user_PE_predict_params = NULL,
   cv = F,
   gamma0 = 3,
   gamma1 = 3,
@@ -18,7 +22,11 @@ AHB_MIP_match(
   M = 1e+05,
   n_prune = ifelse(is.numeric(holdout), round(0.1 * (1 - holdout) * nrow(data)),
     round(0.1 * nrow(data))),
-  MIP_solver = "Rglpk"
+  MIP_solver = "Rglpk",
+  missing_data = "none",
+  missing_holdout = "none",
+  impute_with_treatment = TRUE,
+  impute_with_outcome = FALSE
 )
 }
 \arguments{
@@ -48,10 +56,30 @@ in data and holdout. Defaults to 'treated'.}
 \item{outcome_column_name}{A character with the name of the outcome column in
 holdout and also in data, if supplied in the latter. Defaults to 'outcome'.}
 
-\item{black_box}{Denotes the method to be used to generate outcome model Y.
+\item{PE_method}{Denotes the method to be used to generate outcome model Y.
 If "BART", use bartMachine as ML model to do prediction.
-If "xgb, use xgboost as ML model to do prediction.
- Defaults to '"xgb"'.}
+If "xgb", use xgboost as ML model to do prediction.
+ Defaults to '"BART"'.}
+
+\item{user_PE_fit}{An optional function supplied by the user that can be used
+instead of those allowed for by \code{PE_method} to fit a model for the
+outcome from the covariates. Must take in a matrix of covariates as its
+first argument and a vector outcome as its second argument. Defaults to
+\code{NULL}.}
+
+\item{user_PE_fit_params}{A named list of optional parameters to be used by
+\code{user_PE_fit}. Defaults to \code{NULL}.}
+
+\item{user_PE_predict}{An optional function supplied by the user that can be
+ used to generate predictions from the output of \code{user_PE_fit}. As its
+ first argument, must take an object of the type returned by
+\code{user_PE_fit} and as its second, a matrix of values for which to
+generate predictions. When the outcome is binary or multi-class, must
+return the maximum probability class label. If not supplied,
+defaults to \code{predict}.}
+
+\item{user_PE_predict_params}{A named list of optional parameters to be used
+by \code{user_PE_predict}. Defaults to \code{NULL}.}
 
 \item{cv}{A logical scalar. If \code{TURE}, do cross-validation on the train
 set to generate outcome model Y . Defaults to \code{TRUE}.}
@@ -88,14 +116,35 @@ for constructing the box, the faster this program runs.Defualt n_prune =
 \item{MIP_solver}{Denotes the method to be used to solve MIP problem.
 Optional, if "Rcplex", use Rcplex as solver, which is faster than Rglpk.
 if "Rglpk", use Rglpk as solver, which is free and easy to be installed.}
+
+\item{missing_data}{Specifies how to handle missingness in \code{data}. If
+'none' (default), assumes no missing data; if 'drop', effectively drops
+units with missingness from the data and does not match them;
+if 'impute', imputes the missing data via \code{mice::mice}.}
+
+\item{missing_holdout}{Specifies how to handle missingness in \code{holdout}.
+If 'none' (default), assumes no missing data; if 'drop', effectively drops
+units with missingness and does not use them to compute PE; and if 'impute',
+imputes the missing data via \code{mice::mice}. In this last case, the PE
+at an iteration will be given by the average PE across all imputations.}
+
+\item{impute_with_treatment}{A logical scalar. If \code{TRUE}, uses treatment
+assignment to impute covariates when \code{missing_data = 'impute'} or
+\code{missing_holdout = 'impute'}. Defaults to \code{TRUE}.}
+
+\item{impute_with_outcome}{A logical scalar. If \code{TRUE}, uses outcome
+information to impute covariates when \code{missing_data = 'impute'} or
+\code{missing_holdout = 'impute'}. Defaults to \code{FALSE}.}
 }
 \value{
 The basic object returned by \code{AHB_MIP_match} is a list of 5
- entries: \describe{\item{data}{Data set was matched by \code{AHB_MIP_match}.
+ entries: \describe{\item{data}{Clean data set after preprocessing was matched by \code{AHB_MIP_match}.
  If holdout is not a numeric value, the \code{AHB_MIP_out$data} is the same
  as the data input into \code{AHB_MIP_match}.  If holdout is a numeric scalar
  between 0 and 1, \code{AHB_MIP_out$data} is the remaining proportion of data
- that were matched.} \item{units_id}{A integer vector with unit_id for test
+ that were matched.}
+ \item{data_dummy}{This is dummy version of \code{data}. AHB will convert all categorical data into dummies}
+  \item{units_id}{A integer vector with unit_id for test
  treated units} \item{CATE}{A numeric vector with the conditional average
  treatment effect estimates for every test treated unit in its matched group
  in \code{MGs}} \item{bins}{ An array of two lists where the first one
@@ -104,6 +153,8 @@ The basic object returned by \code{AHB_MIP_match} is a list of 5
  treated unit.} \item{MGs}{A list of all the matched groups formed by
  AHB_fast_match. For each test treated unit, each row contains all unit_id of
  the other units that fall into its box, including itself. } }
+ \item{list_dummyCols}{This is a list of dummy cols after mapping}
+ \item{verbose}{This is used for postprocessing. Contains \code{treated_column_name} and \code{outcome_column_name}}
 }
 \description{
 \code{AHB_MIP_match} runs a MIP Implementation of AHB Matching

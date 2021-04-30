@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1619813067795.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1761872900",
+    "id" : "C281BE5C",
+    "lastKnownWriteTime" : 1615610725,
+    "last_content_update" : 1615610725,
+    "path" : "~/Desktop/github/AHB-R-package/AHB/R/arg_checker.R",
+    "project_path" : "R/arg_checker.R",
+    "properties" : {
+        "cursorPosition" : "14,1",
+        "scrollLine" : "13"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
