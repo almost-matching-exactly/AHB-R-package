@@ -4,7 +4,7 @@
 A R package for performing matching for observational causal inference on datasets containing discrete and continuous covariates
 --------------------------------------------------
 
-## Documentation [here](https://github.com/almost-matching-exactly/AHB-R-package/blob/master/AHB/vignettes/AHB-vignette.pdf)
+## Documentation [here](https://almost-matching-exactly.github.io/AHB-R-package/)
 
 AHB is a R package for performing matching for observational causal inference on datasets containing discrete and continuous covariates. It implements the mixed integer program algorithm for Adaptive Hyper-Boxes (AHB_MIP_matching and approximate fast algorithm for Adaptive Hyper-Boxes (AHB_fast_matching) which match treatment and control units   in unit-specific, hyper-box-shaped regions of the covariate space.  The resulting matched groups are  interpretable, because the matches are made on covariates, and high-quality, because machine learning is used to determine which covariates are important to match on.
 
