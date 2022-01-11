@@ -3,7 +3,11 @@ Type: Package
 Title: Adaptive Hyper-box Matching for Interpretable Individualized Treatment Effect Estimation
 Version: 0.1.0
 Author:
-  c(person(given = 'Marco', 
+  c(person(given = 'Xian', 
+           family = 'Sun',
+           role = c('aut', 'cre'),
+           email = 'almost.matching.exactly@gmail.com'),
+    person(given = 'Marco', 
            family = 'Morucci',
            role = c('aut', 'cre'),
            email = 'almost.matching.exactly@gmail.com'),
@@ -23,7 +27,7 @@ Author:
            family = 'Volfovsky',
            role = 'aut', 
            email = 'alexander.volfovsky@duke.edu'))
-Maintainer: Marco Morucci <almost.matching.exactly@gmail.com>
+Maintainer: Xian Sun <almost.matching.exactly@gmail.com>
 BugReports: https://github.com/almost-matching-exactly/Adaptive-Binning/issues
 Description: Efficient implementations of the algorithms in in causal inference for 
     interpretable matching. These algorithms matches units with others in unit-specific, 

@@ -198,14 +198,15 @@ AHB_fast_match<-function(data,
                          user_PE_predict = NULL, user_PE_predict_params = NULL,
                          cv = F,
                          C = 1.1,
-                         n_prune = ifelse(is.numeric(holdout),
-                                          round(0.1*(1-holdout) * nrow(data)),
-                                          round(0.1*nrow(data))),
+                         n_prune = -1,
                          missing_data = 'none', missing_holdout = 'none',
                          impute_with_treatment = TRUE, impute_with_outcome = FALSE
                          ){
 
   df <- read_data(data,holdout)
+  if (n_prune == -1) {
+    n_prune = round(0.1*nrow(df[[1]]))
+  }
   check_args_fast(df[[1]],df[[2]], treated_column_name, outcome_column_name,
                  PE_method, user_PE_fit, user_PE_fit_params,
                  user_PE_predict, user_PE_predict_params,cv,C,n_prune)

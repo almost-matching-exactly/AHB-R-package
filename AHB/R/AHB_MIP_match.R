@@ -148,15 +148,17 @@ AHB_MIP_match<-function(data,
                         user_PE_fit = NULL, user_PE_fit_params = NULL,
                         user_PE_predict = NULL, user_PE_predict_params = NULL,
                         cv=F,gamma0=3, gamma1=3, beta=2,m=1,M=1e5,
-                        n_prune = ifelse(is.numeric(holdout),
-                                         round(0.1*(1-holdout) * nrow(data)),
-                                         round(0.1*nrow(data))),
+                        n_prune = -1,
                         MIP_solver = "Rglpk",
                         missing_data = 'none', missing_holdout = 'none',
                         impute_with_treatment = TRUE, impute_with_outcome = FALSE
                         ){
 
   df <- read_data(data = data, holdout = holdout)
+  if (n_prune == -1) {
+    n_prune = round(0.1*nrow(df[[1]]))
+  }
+
   check_args_MIP(df[[1]],df[[2]], treated_column_name, outcome_column_name,
                  PE_method, user_PE_fit, user_PE_fit_params,
                  user_PE_predict, user_PE_predict_params,
@@ -228,7 +230,7 @@ For now, n_prune = ", n_prune, ". Try to set n_prune below 400 or even smaller")
     test_df_outcome = test_df[,which(colnames(test_df) == outcome_column_name)]
     #Do preprocessing, only do MIP on varibales with most similar outcome
     ord = order(abs(fhat1[i] - fhat1) * gamma1/sd(fhat1) + abs(fhat0[i] - fhat0) * gamma0/sd(fhat0))
-    cands = c(ord[test_df$treated[ord]==1][2:n_prune], ord[test_df$treated[ord]==0][1:n_prune])
+    cands = c(ord[test_df_treated[ord]==1][2:n_prune], ord[test_df_treated[ord]==0][1:n_prune])
     cands = cands[cands != i]
 
     #do MIP without preprocessing
