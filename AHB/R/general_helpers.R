@@ -4,7 +4,7 @@ estimator_inputs <- function(train_df, test_df,
                              treated_column_name = 'treated',outcome_column_name = 'outcome',
                              user_PE_fit = NULL, user_PE_fit_params = NULL,
                              user_PE_predict = NULL, user_PE_predict_params = NULL,
-                             black_box='xgb', cv= T) {
+                             black_box='xgb', cv= T, n_fold = 5) {
 
   n_train <- nrow(train_df)
   n_units <- nrow(train_df) + nrow(test_df)
@@ -59,7 +59,7 @@ estimator_inputs <- function(train_df, test_df,
                                  data =as.matrix(train_df[,train_out_col_ind]),
                                  verbose = FALSE,
                                  method = 'k-fold',
-                                 n.test = 5,
+                                 n.test = n_fold,
                                  n.reps = 5,
                                  loss = 'rmse',
                                  n.trees = n.trees,
@@ -110,7 +110,7 @@ estimator_inputs <- function(train_df, test_df,
         cv <- xgboost::xgb.cv(data = as.matrix(train_covs),
                       label = as.matrix(train_df[,train_out_col_ind]),
                       params = params, metrics = list('rmse'),
-                      nrounds = param_combs$nrounds[i], nfold = 5, verbose = 0)
+                      nrounds = param_combs$nrounds[i], nfold = n_fold, verbose = 0)
         RMSE[i] <- cv$evaluation_log$test_rmse_mean[param_combs$nrounds[i]]
       }
       best_params <- param_combs[which.min(RMSE), ]

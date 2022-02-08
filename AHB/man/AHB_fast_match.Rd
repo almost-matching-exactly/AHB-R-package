@@ -9,12 +9,13 @@ AHB_fast_match(
   holdout = 0.1,
   treated_column_name = "treated",
   outcome_column_name = "outcome",
-  PE_method = "BART",
+  PE_method = "xgb",
   user_PE_fit = NULL,
   user_PE_fit_params = NULL,
   user_PE_predict = NULL,
   user_PE_predict_params = NULL,
-  cv = F,
+  cv = T,
+  n_fold = 5,
   C = 1.1,
   n_prune = -1,
   missing_data = "none",
@@ -53,7 +54,7 @@ holdout and also in data, if supplied in the latter. Defaults to 'outcome'.}
 \item{PE_method}{Denotes the method to be used to generate outcome model Y.
 If "BART", use bart in dbarts as ML model to do prediction.
 If "xgb, use xgboost as ML model to do prediction.
- Defaults to "BART".}
+ Defaults to "xgb".}
 
 \item{user_PE_fit}{An optional function supplied by the user that can be used
 instead of those allowed for by \code{PE_method} to fit a model for the
@@ -77,6 +78,9 @@ by \code{user_PE_predict}. Defaults to \code{NULL}.}
 
 \item{cv}{A logical scalar. If \code{TURE}, do cross-validation on the train
 set to generate outcome model Y . Defaults to \code{TRUE}.}
+
+\item{n_fold}{A numeric value. do k-fold cross-validations on the holdout
+set . Defaults to 5.}
 
 \item{C}{A positive scalar. Determines the stopping condition for Fast AHB.
 When the variance in a newly expanded region exceeds C times the variance in

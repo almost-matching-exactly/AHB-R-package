@@ -109,7 +109,7 @@ preprocess_covs <- function(cands, test_covs){
 #'@param PE_method Denotes the method to be used to generate outcome model Y.
 #' If "BART", use bart in dbarts as ML model to do prediction.
 #' If "xgb, use xgboost as ML model to do prediction.
-#'  Defaults to "BART".
+#'  Defaults to "xgb".
 #'
 #' @param user_PE_fit An optional function supplied by the user that can be used
 #'   instead of those allowed for by \code{PE_method} to fit a model for the
@@ -130,6 +130,9 @@ preprocess_covs <- function(cands, test_covs){
 #'
 #'@param cv A logical scalar. If \code{TURE}, do cross-validation on the train
 #'  set to generate outcome model Y . Defaults to \code{TRUE}.
+#'
+#'@param n_fold A numeric value. do k-fold cross-validations on the holdout
+#'  set . Defaults to 5.
 #'
 #'@param C A positive scalar. Determines the stopping condition for Fast AHB.
 #'  When the variance in a newly expanded region exceeds C times the variance in
@@ -193,10 +196,11 @@ AHB_fast_match<-function(data,
                          holdout = 0.1,
                          treated_column_name = 'treated',
                          outcome_column_name = 'outcome',
-                         PE_method = "BART",
+                         PE_method = "xgb",
                          user_PE_fit = NULL, user_PE_fit_params = NULL,
                          user_PE_predict = NULL, user_PE_predict_params = NULL,
-                         cv = F,
+                         cv = T,
+                         n_fold = 5,
                          C = 1.1,
                          n_prune = -1,
                          missing_data = 'none', missing_holdout = 'none',
@@ -209,7 +213,7 @@ AHB_fast_match<-function(data,
   }
   check_args_fast(df[[1]],df[[2]], treated_column_name, outcome_column_name,
                  PE_method, user_PE_fit, user_PE_fit_params,
-                 user_PE_predict, user_PE_predict_params,cv,C,n_prune)
+                 user_PE_predict, user_PE_predict_params,cv,C,n_prune,n_fold)
 
   df[[2]] <- mapCategoricalToFactor(df[[2]],treated_column_name, outcome_column_name)
   df[[1]] <- mapCategoricalToFactor(df[[1]],treated_column_name, outcome_column_name)
@@ -228,7 +232,7 @@ AHB_fast_match<-function(data,
                              user_PE_fit = user_PE_fit, user_PE_fit_params = user_PE_fit_params,
                              user_PE_predict = user_PE_predict, user_PE_predict_params = user_PE_predict_params,
                              treated_column_name= treated_column_name, outcome_column_name=outcome_column_name,
-                             black_box =  PE_method, cv = cv)
+                             black_box =  PE_method, cv = cv, n_fold = n_fold)
 
   p = inputs[[4]]
   test_df = inputs[[9]]

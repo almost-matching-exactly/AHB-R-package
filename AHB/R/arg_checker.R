@@ -43,7 +43,6 @@ check_hpyerparameter_MIP <-function(PE_method,cv,gamma0,gamma1,beta,m,M,MIP_solv
   if (MIP_solver!="Rglpk" && MIP_solver!="Rcplex") {
     stop('MIP_solver must be Rglpk or Rcplex .')
   }
-
 }
 
 
@@ -138,9 +137,13 @@ check_args_MIP<-function(data,
                      user_PE_fit, user_PE_fit_params,
                      user_PE_predict, user_PE_predict_params,
                      cv,gamma0, gamma1, beta,m,M,n_prune,
-                     MIP_solver){
+                     MIP_solver,n_fold){
   if((!is.numeric(n_prune)) | n_prune <= 0 | n_prune > NROW(data)){
     stop("n_prune must be numeric between 0 and the number of units in the dataset")
+  }
+  if (n_fold <= 1 | n_fold >= nrow(holdout)) {
+    msg = paste0("n_fold must be numeric between 2 and ", nrow(holdout) - 1, " nrow(holdout)" )
+    stop(msg)
   }
   check_args_dataset(data,holdout,treated_column_name, outcome_column_name)
   check_users_PE(user_PE_fit, user_PE_fit_params,user_PE_predict, user_PE_predict_params)
@@ -156,11 +159,25 @@ check_args_fast<-function(data,
                          user_PE_predict, user_PE_predict_params,
                          cv,
                          C,
-                         n_prune){
+                         n_prune,n_fold){
   if((!is.numeric(n_prune)) | n_prune <= 0 | n_prune > NROW(data)){
     stop("n_prune must be numeric between 0 and the number of units in the dataset")
+  }
+  if (n_fold <= 1 | n_fold >= nrow(holdout)) {
+    msg = paste0("n_fold must be numeric between 2 and ", nrow(holdout) - 1, " nrow(holdout)" )
+    stop(msg)
   }
   check_args_dataset(data,holdout,treated_column_name, outcome_column_name)
   check_users_PE(user_PE_fit, user_PE_fit_params,user_PE_predict, user_PE_predict_params)
   check_hpyerparameter_fast(PE_method,cv,C)
+}
+
+check_fhat_diversity_of_dataset<-function(f_hat, holdout_covs) {
+  if (sd(f_hat) == 0) {
+    msg = paste0("Error: sd(f_hat) == 0,  nrow(unique(holdout_covs)) = ", nrow(unique(holdout_covs)))
+    msg = paste0(msg, "\nPlease try followings:\n
+                 1. Set cv = T and increase n_fold;\n
+                 2. Increase the size of holdout set;")
+    stop(msg)
+  }
 }

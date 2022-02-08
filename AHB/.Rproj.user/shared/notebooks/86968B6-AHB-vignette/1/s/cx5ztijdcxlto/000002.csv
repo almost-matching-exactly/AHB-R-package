@@ -1,5 +1,0 @@
-"0","set.seed(45)"
-"0","n <- 50"
-"0","p <- 5"
-"0","data <- gen_data(n, p) # Data we would like to match"
-"0","holdout <- gen_data(n, p) # Data we will train on, to generate outcome model Y"

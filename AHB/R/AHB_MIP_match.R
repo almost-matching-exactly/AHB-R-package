@@ -43,7 +43,7 @@
 #'@param PE_method Denotes the method to be used to generate outcome model Y.
 #' If "BART", use bartMachine as ML model to do prediction.
 #' If "xgb", use xgboost as ML model to do prediction.
-#'  Defaults to '"BART"'.
+#'  Defaults to '"xgb"'.
 #'
 #' @param user_PE_fit An optional function supplied by the user that can be used
 #'   instead of those allowed for by \code{PE_method} to fit a model for the
@@ -64,6 +64,9 @@
 #'
 #'@param cv A logical scalar. If \code{TURE}, do cross-validation on the train
 #'  set to generate outcome model Y . Defaults to \code{TRUE}.
+#'
+#'@param n_fold A numeric value. do k-fold cross-validations on the holdout
+#'  set . Defaults to 5.
 #'
 #'@param gamma0 A numeric value, one of hyperparameters in global MIP that
 #'  controls the weight placed on the outcome function portion of the loss.
@@ -147,7 +150,7 @@ AHB_MIP_match<-function(data,
                         PE_method="xgb",
                         user_PE_fit = NULL, user_PE_fit_params = NULL,
                         user_PE_predict = NULL, user_PE_predict_params = NULL,
-                        cv=F,gamma0=3, gamma1=3, beta=2,m=1,M=1e5,
+                        cv=T,n_fold = 5, gamma0=3, gamma1=3, beta=2,m=1,M=1e5,
                         n_prune = -1,
                         MIP_solver = "Rglpk",
                         missing_data = 'none', missing_holdout = 'none',
@@ -162,7 +165,7 @@ AHB_MIP_match<-function(data,
   check_args_MIP(df[[1]],df[[2]], treated_column_name, outcome_column_name,
                  PE_method, user_PE_fit, user_PE_fit_params,
                  user_PE_predict, user_PE_predict_params,
-                 cv,gamma0, gamma1, beta,m,M,n_prune, MIP_solver)
+                 cv,gamma0, gamma1, beta,m,M,n_prune, MIP_solver, n_fold)
   # get outcome model with train set
   df[[2]] <- mapCategoricalToFactor(df[[2]],treated_column_name, outcome_column_name)
   df[[1]] <- mapCategoricalToFactor(df[[1]],treated_column_name, outcome_column_name)
@@ -181,7 +184,7 @@ AHB_MIP_match<-function(data,
                              user_PE_fit = user_PE_fit, user_PE_fit_params = user_PE_fit_params,
                              user_PE_predict = user_PE_predict, user_PE_predict_params = user_PE_predict_params,
                              treated_column_name= treated_column_name, outcome_column_name=outcome_column_name,
-                             black_box =  PE_method, cv = cv)
+                             black_box =  PE_method, cv = cv,  n_fold = n_fold)
   n_train = inputs[[3]]
   p = inputs[[4]]
   test_df = inputs[[9]]
@@ -203,10 +206,13 @@ AHB_MIP_match<-function(data,
   }
   fhat1 <- do.call(PE_predict, c(list(bart_fit1, as.matrix(test_covs)), PE_predict_params))
   fhat0 <- do.call(PE_predict, c(list(bart_fit0, as.matrix(test_covs)), PE_predict_params))
+
   if(PE_method=='BART' && is.null(user_PE_predict) && is.null(user_PE_fit)){
     fhat1<- colMeans(fhat1)
     fhat0<- colMeans(fhat0)
   }
+  check_fhat_diversity_of_dataset(fhat1,test_covs)
+  check_fhat_diversity_of_dataset(fhat0,test_covs)
 
   #MIP
   mip_cates = numeric(n_test_treated[1])
@@ -332,6 +338,8 @@ addToleranceToBounds<-function(mip_bins,l,indexesForIntAndOther){
   }
   return (mip_bins)
 }
+
+
 
 
 
